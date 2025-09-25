@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/drawable/circleshape.xml" value="0.22552083333333334" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/drawable/custom_button.xml" value="0.22552083333333334" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/drawable/custombutton_income.xml" value="0.22552083333333334" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/drawable/month_list.xml" value="0.22552083333333334" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/drawable/progresscircle.xml" value="0.22552083333333334" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/drawable/roundconer.xml" value="0.22552083333333334" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/layout/activity_expense.xml" value="0.209375" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/layout/activity_home_screen.xml" value="0.209375" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/layout/activity_income.xml" value="0.209375" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/layout/activity_login_screen.xml" value="0.209375" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/layout/activity_setlimit.xml" value="0.209375" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/layout/activity_sign_in.xml" value="0.209375" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/layout/fragment_dashboard_.xml" value="0.209375" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/layout/fragment_home_.xml" value="0.209375" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/layout/fragment_profile_.xml" value="0.209375" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/layout/fragment_transaction_.xml" value="0.209375" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/layout/item_layout.xml" value="0.209375" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/layout/listitem.xml" value="0.1" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/layout/rounded_border_edittext.xml" value="0.371875" />
+        <entry key="..\:/Uni Lib/#EES/3rd Year/EES 311 1.0 Mobile Application Development/FinancialApp/app/src/main/res/menu/bottom_menu.xml" value="0.209375" />
+      </map>
+    </option>
+  </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="jbr-21" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
