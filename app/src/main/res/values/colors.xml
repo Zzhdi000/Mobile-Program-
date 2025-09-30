@@ -7,10 +7,12 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="red">#FF0000</color>
     <color name="income_purple">#ADA4C8</color>
     <color name="outcome_purple">#927CD2</color>
     <color name="light_gray">#EEEEEE</color>
     <color name="card_viewRed">#FFEBEE</color>
     <color name="card_viewGreen">#E0F2F1</color>
     <color name="gray_text">#9E9E9E</color>
+    <color name="outcome_blue">#0045A8</color>
 </resources>

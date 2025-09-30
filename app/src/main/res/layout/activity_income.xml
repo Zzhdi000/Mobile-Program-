@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".IncomeActivity"
-    android:background="@color/outcome_purple">
+        android:background="@color/outcome_purple">
 
     <LinearLayout
         android:layout_width="match_parent"
