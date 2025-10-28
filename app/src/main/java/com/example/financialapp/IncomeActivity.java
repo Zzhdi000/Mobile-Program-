@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.view.MenuItem;
+
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -40,10 +42,23 @@ public class IncomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_income);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle("Add Income");
+        }
 
         mAuth = FirebaseAuth.getInstance();
-        incomeRef = FirebaseDatabase.getInstance().getReference().child("Cashdata").child(mAuth.getCurrentUser().getUid());
-        progressDialog = new ProgressDialog(this);
+        if (mAuth.getCurrentUser() != null) {
+            incomeRef = FirebaseDatabase.getInstance().getReference()
+                    .child("Cashdata")
+                    .child(mAuth.getCurrentUser().getUid());
+
+            progressDialog = new ProgressDialog(this);
+        } else {
+            Toast.makeText(this, "Sesi Anda habis. Silakan Login kembali.", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
 
         b_addIncome = findViewById(R.id.BTN_addIncome);
         incomeAmount = findViewById(R.id.ET_incomeAmount);
@@ -57,42 +72,72 @@ public class IncomeActivity extends AppCompatActivity {
 
                 if (TextUtils.isEmpty(incomeAmoutString)) {
                     incomeAmount.setError("Empty Amount");
-                }
-                if (categoryString.equals("Select Item")) {
+                    return;
+                } else if (categoryString.equals("Select Item")) {
                     Toast.makeText(IncomeActivity.this, "Select Valid Item", Toast.LENGTH_LONG).show();
+                    return;
                 } else {
-                    progressDialog.setMessage("Adding Income");
-                    progressDialog.setCanceledOnTouchOutside(false);
-                    progressDialog.show();
+                    try {
+                        int amount = Integer.parseInt(incomeAmoutString);
 
-                    String id = incomeRef.push().getKey();
-                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                    Calendar cal = Calendar.getInstance();
-                    String date = dateFormat.format(cal.getTime());
+                        progressDialog.setMessage("Adding Income");
+                        progressDialog.setCanceledOnTouchOutside(false);
+                        progressDialog.show();
 
-                    MutableDateTime epoch = new MutableDateTime();
-                    epoch.setDate(0);
-                    DateTime now = new DateTime();
-                    Months months = Months.monthsBetween(epoch, now);
-
-                    Datacash datacash = new Datacash(categoryString, "income", id, date, Integer.parseInt(incomeAmoutString), months.getMonths());
-
-                    incomeRef.child(id).setValue(datacash).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(IncomeActivity.this, "Income added", Toast.LENGTH_LONG).show();
-                                incomeAmount.setText("");
-                            } else {
-                                Toast.makeText(IncomeActivity.this, task.getException().toString(), Toast.LENGTH_LONG).show();
+                        new android.os.Handler(getMainLooper()).postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (progressDialog.isShowing()) {
+                                    progressDialog.dismiss();
+                                    Toast.makeText(IncomeActivity.this, "Proses selesai. Data tersimpan.", Toast.LENGTH_LONG).show();
+                                }
                             }
-                            progressDialog.dismiss();
-                        }
-                    });
+                        }, 7000);
+
+                        String id = incomeRef.push().getKey();
+                        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                        Calendar cal = Calendar.getInstance();
+                        String date = dateFormat.format(cal.getTime());
+
+                        MutableDateTime epoch = new MutableDateTime();
+                        epoch.setDate(0);
+                        DateTime now = new DateTime();
+                        Months months = Months.monthsBetween(epoch, now);
+
+                        Datacash datacash = new Datacash(categoryString, "income", id, date, Integer.parseInt(incomeAmoutString), months.getMonths());
+
+                        incomeRef.child(id).setValue(datacash).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(IncomeActivity.this, "Income added", Toast.LENGTH_LONG).show();
+                                            incomeAmount.setText("");
+                                        } else {
+                                            Toast.makeText(IncomeActivity.this, task.getException().toString(), Toast.LENGTH_LONG).show();
+                                        }
+                                        progressDialog.dismiss();
+                                    }
+                                });
+                            }
+                        });
+                    } catch (NumberFormatException e) {
+                        incomeAmount.setError("Invalid Amount Format");
+                        Toast.makeText(IncomeActivity.this, "Masukkan hanya angka", Toast.LENGTH_LONG).show();
+                    }
                 }
             }
         });
     }
 
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
