@@ -20,7 +20,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginScreen extends AppCompatActivity {
 
-    private EditText userName, password ;
+    private EditText userName, password;
     private Button loginBtn;
     private TextView registerUser, forgotPW;
 
@@ -41,51 +41,41 @@ public class LoginScreen extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         progressDialog = new ProgressDialog(this);
 
-        registerUser.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginScreen.this, SignInActivity.class);
-                startActivity(intent);
-                finish();
+        registerUser.setOnClickListener(v ->
+                startActivity(new Intent(LoginScreen.this, SignInActivity.class))
+        );
+
+        loginBtn.setOnClickListener(v -> {
+            String email = userName.getText().toString().trim();
+            String pass = password.getText().toString().trim();
+
+            if (TextUtils.isEmpty(email)) {
+                userName.setError("Email required");
+                return;
             }
-        });
+            if (TextUtils.isEmpty(pass)) {
+                password.setError("Password required");
+                return;
+            }
 
-        loginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String usernameString  = userName.getText().toString();
-                String passwordString = password.getText().toString();
+            progressDialog.setMessage("Logging in...");
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.show();
 
-                if(TextUtils.isEmpty(usernameString)){
-                    userName.setError("Empty User Name");
-                }
+            mAuth.signInWithEmailAndPassword(email, pass)
+                    .addOnCompleteListener(task -> {
+                        progressDialog.dismiss();
 
-                if(TextUtils.isEmpty(passwordString)){
-                    password.setError("Empty Password");
-                }
-
-                else{
-                    progressDialog.setMessage("Login In Progress");
-                    progressDialog.setCanceledOnTouchOutside(false);
-                    progressDialog.show();
-
-                    mAuth.signInWithEmailAndPassword(usernameString, passwordString).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if(task.isSuccessful()){
-                             Intent intent = new Intent(LoginScreen.this,MainActivity.class);
-                             startActivity(intent);
-                             finish();
-                             progressDialog.dismiss();
-                            }else{
-                                Toast.makeText(LoginScreen.this, task.getException().toString(), Toast.LENGTH_LONG).show();
-                                progressDialog.dismiss();
-                            }
+                        if (task.isSuccessful()) {
+                            Toast.makeText(LoginScreen.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(LoginScreen.this, MainActivity.class));
+                            finish();
+                        } else {
+                            Toast.makeText(LoginScreen.this,
+                                    task.getException().getMessage(),
+                                    Toast.LENGTH_LONG).show();
                         }
                     });
-                }
-            }
         });
-
     }
 }

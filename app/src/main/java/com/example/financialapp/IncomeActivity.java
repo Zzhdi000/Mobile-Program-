@@ -1,98 +1,158 @@
 package com.example.financialapp;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.view.View;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 
-import org.joda.time.DateTime;
-import org.joda.time.Months;
-import org.joda.time.MutableDateTime;
-
-import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class IncomeActivity extends AppCompatActivity {
 
-    private Button b_addIncome;
-    private EditText incomeAmount;
-    private Spinner category;
+    private EditText etAmount;
+    private Spinner spinnerCategory;
+    private Button btnAdd;
 
     private FirebaseAuth mAuth;
-    private DatabaseReference incomeRef;
-    private ProgressDialog progressDialog;
+    private DatabaseReference cashRef;
+    private String currency = "LKR";
+
+    private boolean isEditing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_income);
 
+        etAmount = findViewById(R.id.etAmount);
+        spinnerCategory = findViewById(R.id.spinnerCategory);
+        btnAdd = findViewById(R.id.btnAdd);
+
         mAuth = FirebaseAuth.getInstance();
-        incomeRef = FirebaseDatabase.getInstance().getReference().child("Cashdata").child(mAuth.getCurrentUser().getUid());
-        progressDialog = new ProgressDialog(this);
+        cashRef = FirebaseDatabase.getInstance().getReference("Cashdata")
+                .child(mAuth.getCurrentUser().getUid());
 
-        b_addIncome = findViewById(R.id.BTN_addIncome);
-        incomeAmount = findViewById(R.id.ET_incomeAmount);
-        category = findViewById(R.id.incomeCategorySpinner);
+        loadCurrency();
+        setupCategorySpinner();
+        setupAmountFormatter();
 
-        b_addIncome.setOnClickListener(new View.OnClickListener() {
+        btnAdd.setOnClickListener(v -> saveIncome());
+    }
+
+    // ==========================
+    // LOAD CURRENCY (FIXED)
+    // ==========================
+    private void loadCurrency() {
+        FirebaseDatabase.getInstance().getReference("Users")
+                .child(mAuth.getCurrentUser().getUid())
+                .child("currency")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot s) {
+                        if (s.exists()) currency = s.getValue(String.class);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) { }
+                });
+    }
+
+    private void setupCategorySpinner() {
+        ArrayList<String> categories = new ArrayList<>();
+        categories.add("Salary");
+        categories.add("Gift");
+        categories.add("Bonus");
+        categories.add("Business");
+        categories.add("Other");
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_dropdown_item,
+                categories
+        );
+        spinnerCategory.setAdapter(adapter);
+    }
+
+    private void setupAmountFormatter() {
+        etAmount.addTextChangedListener(new TextWatcher() {
+
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
             @Override
-            public void onClick(View v) {
-                String incomeAmoutString = incomeAmount.getText().toString();
-                String categoryString = category.getSelectedItem().toString();
+            public void afterTextChanged(Editable s) {
+                if (isEditing) return;
+                isEditing = true;
 
-                if (TextUtils.isEmpty(incomeAmoutString)) {
-                    incomeAmount.setError("Empty Amount");
-                }
-                if (categoryString.equals("Select Item")) {
-                    Toast.makeText(IncomeActivity.this, "Select Valid Item", Toast.LENGTH_LONG).show();
-                } else {
-                    progressDialog.setMessage("Adding Income");
-                    progressDialog.setCanceledOnTouchOutside(false);
-                    progressDialog.show();
+                try {
+                    String clean = s.toString().replace(".", "");
+                    if (clean.isEmpty()) {
+                        isEditing = false;
+                        return;
+                    }
 
-                    String id = incomeRef.push().getKey();
-                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                    Calendar cal = Calendar.getInstance();
-                    String date = dateFormat.format(cal.getTime());
+                    long parsed = Long.parseLong(clean);
+                    DecimalFormat df = new DecimalFormat("#,###");
+                    String formatted = df.format(parsed).replace(",", ".");
+                    etAmount.setText(formatted);
+                    etAmount.setSelection(formatted.length());
 
-                    MutableDateTime epoch = new MutableDateTime();
-                    epoch.setDate(0);
-                    DateTime now = new DateTime();
-                    Months months = Months.monthsBetween(epoch, now);
+                } catch (Exception ignored) {}
 
-                    Datacash datacash = new Datacash(categoryString, "income", id, date, Integer.parseInt(incomeAmoutString), months.getMonths());
-
-                    incomeRef.child(id).setValue(datacash).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(IncomeActivity.this, "Income added", Toast.LENGTH_LONG).show();
-                                incomeAmount.setText("");
-                            } else {
-                                Toast.makeText(IncomeActivity.this, task.getException().toString(), Toast.LENGTH_LONG).show();
-                            }
-                            progressDialog.dismiss();
-                        }
-                    });
-                }
+                isEditing = false;
             }
         });
     }
 
+    private void saveIncome() {
 
+        String amountStr = etAmount.getText().toString().trim().replace(".", "");
+        if (amountStr.isEmpty()) {
+            Toast.makeText(this, "Enter income amount", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int amount = Integer.parseInt(amountStr);
+        String category = spinnerCategory.getSelectedItem().toString();
+
+        String date = new SimpleDateFormat("dd-MM-yyyy").format(Calendar.getInstance().getTime());
+        int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+
+        String id = cashRef.push().getKey();
+
+        Datacash d = new Datacash(
+                category,
+                "income",
+                id,
+                date,
+                amount,
+                month
+        );
+
+        d.setCurrency(currency);
+
+        cashRef.child(id).setValue(d).addOnCompleteListener(t -> {
+            Toast.makeText(this, "Income added", Toast.LENGTH_SHORT).show();
+            finish();
+        });
+    }
 }

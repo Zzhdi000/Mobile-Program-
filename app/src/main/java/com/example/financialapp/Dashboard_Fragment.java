@@ -1,17 +1,18 @@
 package com.example.financialapp;
 
-import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -20,168 +21,227 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-
 public class Dashboard_Fragment extends Fragment {
 
-    private ProgressBar progressBarFood, progressBarUtility, progressBarHealthCare, progressBarOthers, progressBarExpense;
-    private TextView valueFood, valueUtility, valuesHealthCare, valueOthers, valueTotalexpense, valueTotalIncome;
-    private Button btn_setLimit;
-
     private FirebaseAuth mAuth;
-    private DatabaseReference dbRef, budgetdbRef;
+    private DatabaseReference cashRef, limitRef;
 
-    int foodbev = 0;
-    int utilities = 0;
-    int healthCare = 0;
-    int others = 0;
+    private String currency = "LKR";
 
-    int foodCatAmount;
-    int otherCatAmount;
-    int utilityCatAmount;
-    int healthCatAmount;
+    private TextView tvTotalIncome, tvTotalExpense;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    private TextView tvFoodLimit, tvFoodUsed;
+    private ProgressBar pbFood;
+
+    private TextView tvUtilityLimit, tvUtilityUsed;
+    private ProgressBar pbUtility;
+
+    private TextView tvHealthLimit, tvHealthUsed;
+    private ProgressBar pbHealth;
+
+    private TextView tvOtherLimit, tvOtherUsed;
+    private ProgressBar pbOther;
+
+    private CardView cardSetLimit;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        View v = inflater.inflate(R.layout.fragment_dashboard_, container, false);
+
         mAuth = FirebaseAuth.getInstance();
-        dbRef = FirebaseDatabase.getInstance().getReference().child("Cashdata").child(mAuth.getCurrentUser().getUid());
-        budgetdbRef = FirebaseDatabase.getInstance().getReference().child("BudgetLimit").child(mAuth.getCurrentUser().getUid());
 
-        View view = inflater.inflate(R.layout.fragment_dashboard_, container, false);
+        if (mAuth.getCurrentUser() == null) {
+            Toast.makeText(getContext(), "Please login again.", Toast.LENGTH_SHORT).show();
+            return v;
+        }
 
-        btn_setLimit = view.findViewById(R.id.btn_setLimit);
+        cashRef = FirebaseDatabase.getInstance()
+                .getReference("Cashdata")
+                .child(mAuth.getCurrentUser().getUid());
 
-        progressBarFood = view.findViewById(R.id.pro_foofBrev);
-        progressBarHealthCare = view.findViewById(R.id.pro_healthCare);
-        progressBarUtility = view.findViewById(R.id.pro_utility);
-        progressBarOthers = view.findViewById(R.id.pro_other);
-        progressBarExpense = view.findViewById(R.id.pro_totalExpense);
+        limitRef = FirebaseDatabase.getInstance()
+                .getReference("BudgetLimit")
+                .child(mAuth.getCurrentUser().getUid());
 
-        valueOthers = view.findViewById(R.id.otherVale);
-        valueFood = view.findViewById(R.id.foodbevValue);
-        valuesHealthCare = view.findViewById(R.id.healthCareValue);
-        valueUtility = view.findViewById(R.id.utilityValue);
-        valueTotalexpense = view.findViewById(R.id.totalExpenseValue);
-        valueTotalIncome = view.findViewById(R.id.TF_totalIncome);
+        tvTotalIncome = v.findViewById(R.id.TV_totalIncome);
+        tvTotalExpense = v.findViewById(R.id.TV_totalExpense);
 
-        btn_setLimit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getActivity(), SetlimitActivity.class);
-                startActivity(i);
-            }
-        });
+        tvFoodLimit = v.findViewById(R.id.tvFoodLimit);
+        tvFoodUsed = v.findViewById(R.id.tvFoodUsed);
+        pbFood = v.findViewById(R.id.pbFood);
 
-        return view;
+        tvUtilityLimit = v.findViewById(R.id.tvUtilityLimit);
+        tvUtilityUsed = v.findViewById(R.id.tvUtilityUsed);
+        pbUtility = v.findViewById(R.id.pbUtility);
+
+        tvHealthLimit = v.findViewById(R.id.tvHealthLimit);
+        tvHealthUsed = v.findViewById(R.id.tvHealthUsed);
+        pbHealth = v.findViewById(R.id.pbHealth);
+
+        tvOtherLimit = v.findViewById(R.id.tvOtherLimit);
+        tvOtherUsed = v.findViewById(R.id.tvOtherUsed);
+        pbOther = v.findViewById(R.id.pbOther);
+
+        cardSetLimit = v.findViewById(R.id.cardSetLimit);
+        cardSetLimit.setOnClickListener(view ->
+                startActivity(new android.content.Intent(getActivity(), SetlimitActivity.class))
+        );
+
+        loadCurrency();
+
+        return v;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
+    private void loadCurrency() {
+        CurrencyHelper.getCurrency(mAuth, c -> {
+            currency = c;
+            loadSummary();
+            loadAllLimits();
+        });
+    }
 
-        dbRef.addValueEventListener(new ValueEventListener() {
+    private void loadSummary() {
+        cashRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                int totalIncome = 0;
-                int totalExpense = 0;
 
-                String type = null;
-                String categoryType = null;
+                int totInc = 0;
+                int totExp = 0;
 
-                for (DataSnapshot snap : snapshot.getChildren()) {
-                    Datacash datacash = snap.getValue(Datacash.class);
+                for (DataSnapshot s : snapshot.getChildren()) {
+                    Datacash d = s.getValue(Datacash.class);
+                    if (d == null) continue;
 
-                    type = datacash.getType();
-                    categoryType = datacash.getCategoryData();
-
-                    if (type.equals("income")) {
-                        totalIncome += datacash.getAmount();
-                    }
-                    if (type.equals("expense")) {
-                        totalExpense += datacash.getAmount();
-                    }
-
-                    if (categoryType.equals("Food & Beverages")) {
-                        foodbev += datacash.getAmount();
-                    }
-                    if (categoryType.equals("Utilities")) {
-                        utilities += datacash.getAmount();
-                    }
-                    if (categoryType.equals("Health Care")) {
-                        healthCare += datacash.getAmount();
-                    }
-                    if (categoryType.equals("Others")) {
-                        others += datacash.getAmount();
-                    }
+                    if ("income".equals(d.getType()))
+                        totInc += d.getAmount();
+                    else if ("expense".equals(d.getType()))
+                        totExp += d.getAmount();
                 }
 
-                int foodPres = foodbev * 100 / totalExpense;
-                int utilityPres = utilities * 100 / totalExpense;
-                int healthPres = healthCare * 100 / totalExpense;
-                int otherPres = others * 100 / totalExpense;
-                int expensePres = totalExpense * 100 / totalIncome;
-
-                budgetdbRef.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                        String categoryType;
-
-                        int amountCategory;
-
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            BudgetLimit budgetLimit = dataSnapshot.getValue(BudgetLimit.class);
-
-                            categoryType = budgetLimit.getCategory();
-
-                            if (categoryType.equals("food")) {
-                                foodCatAmount = budgetLimit.getAmount();
-                            }
-                            if (categoryType.equals("other")) {
-                                otherCatAmount = budgetLimit.getAmount();
-                            }
-                            if (categoryType.equals("health")) {
-                                healthCatAmount = budgetLimit.getAmount();
-                            }
-                            if (categoryType.equals("utility")) {
-                                utilityCatAmount = budgetLimit.getAmount();
-                            }
-                        }
-
-                        valueFood.setText(String.valueOf(foodPres) + "% | " + "LKR " + String.valueOf(foodbev) + ".00 | Limit - " + String.valueOf(foodCatAmount));
-                        valueOthers.setText(String.valueOf(otherPres) + "% | " + "LKR " + String.valueOf(others) + ".00 | Limit - " + String.valueOf(otherCatAmount));
-                        valuesHealthCare.setText(String.valueOf(healthPres) + "% | " + "LKR" + String.valueOf(healthCare) + ".00 | Limit - " + String.valueOf(healthCatAmount));
-                        valueUtility.setText(String.valueOf(utilityPres) + "% | " + "LKR " + String.valueOf(utilities) + ".00 | Limit - " + String.valueOf(utilityCatAmount));
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-
-
-                valueTotalexpense.setText(String.valueOf(expensePres) + "% | " + "LKR " + String.valueOf(totalExpense) + ".00");
-                valueTotalIncome.setText("LKR " + String.valueOf(totalIncome) + ".00");
-
-                progressBarFood.setProgress(foodPres);
-                progressBarHealthCare.setProgress(healthPres);
-                progressBarOthers.setProgress(otherPres);
-                progressBarUtility.setProgress(utilityPres);
-                progressBarExpense.setProgress(expensePres);
-
+                tvTotalIncome.setText(currency + " " + totInc);
+                tvTotalExpense.setText(currency + " " + totExp);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Toast.makeText(getContext(), "Firebase error", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void loadAllLimits() {
+        loadLimit("food", tvFoodLimit, tvFoodUsed, pbFood);
+        loadLimit("utility", tvUtilityLimit, tvUtilityUsed, pbUtility);
+        loadLimit("health", tvHealthLimit, tvHealthUsed, pbHealth);
+        loadLimit("other", tvOtherLimit, tvOtherUsed, pbOther);
+    }
+
+    private void loadLimit(String category, TextView tvLimit, TextView tvUsed, ProgressBar pb) {
+
+        limitRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snap) {
+
+                int limit = 0;
+
+                for (DataSnapshot s : snap.getChildren()) {
+                    BudgetLimit bl = s.getValue(BudgetLimit.class);
+                    if (bl == null || bl.getCategory() == null) continue;
+
+                    if (category.equalsIgnoreCase(bl.getCategory()))
+                        limit = bl.getAmount();
+                }
+
+                tvLimit.setText("Limit: " + currency + " " + limit);
+                int finalLimit = limit;
+
+                cashRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot s2) {
+
+                        int used = 0;
+
+                        for (DataSnapshot s : s2.getChildren()) {
+                            Datacash d = s.getValue(Datacash.class);
+                            if (d == null || d.getCategory() == null) continue;
+
+                            if ("expense".equals(d.getType()) &&
+                                    category.equalsIgnoreCase(d.getCategory()))
+                                used += d.getAmount();
+                        }
+
+                        tvUsed.setText("Used: " + currency + " " + used);
+
+                        // =====================================================
+                        //     WARNING + DISABLE SET LIMIT (AMANKAN)
+                        // =====================================================
+
+                        if (finalLimit > 0 && used >= finalLimit) {
+
+                            // Disable tombol Set Limit
+                            cardSetLimit.setEnabled(false);
+                            cardSetLimit.setAlpha(0.5f);
+
+                            // Tampilkan 1x/hari
+                            if (getContext() != null &&
+                                    LimitWarningHelper.shouldShow(getContext(), category)) {
+
+                                Toast.makeText(
+                                        getContext(),
+                                        "Warning: limit for " + category + " reached!",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+
+                                if (getActivity() != null && isAdded()) {
+                                    new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                                            .setTitle("Limit Reached")
+                                            .setMessage("You have reached the limit for " + category + ".")
+                                            .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                                            .show();
+                                }
+
+                                LimitWarningHelper.setShown(getContext(), category);
+                            }
+
+                        } else {
+                            // Limit BELUM tercapai → tombol aktif normal
+                            cardSetLimit.setEnabled(true);
+                            cardSetLimit.setAlpha(1f);
+                        }
+
+                        updateProgressBar(finalLimit, used, pb);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    private void updateProgressBar(int limit, int used, ProgressBar pb) {
+
+        if (pb == null) return;
+
+        int percent = 0;
+        if (limit > 0)
+            percent = (used * 100) / limit;
+
+        pb.setProgress(percent);
+
+        try {
+            if (percent < 75)
+                pb.getProgressDrawable().setTint(Color.parseColor("#6C5CE7"));
+            else if (percent < 100)
+                pb.getProgressDrawable().setTint(Color.parseColor("#E67E22"));
+            else
+                pb.getProgressDrawable().setTint(Color.parseColor("#E74C3C"));
+
+        } catch (Exception ignored) {}
     }
 }

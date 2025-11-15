@@ -1,0 +1,34 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:text="View History"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/btnDaily"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Daily History"/>
+
+    <Button
+        android:id="@+id/btnWeekly"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Weekly History"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btnMonthly"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Monthly History"
+        android:layout_marginTop="10dp"/>
+</LinearLayout>

@@ -2,40 +2,53 @@ package com.example.financialapp;
 
 public class BudgetLimit {
 
-    String category, id;
-    int amount;
+    private String category;
+    private int amount;
+    private String id;
+    private int month;   // digunakan untuk lock limit hanya bulan ini
 
-    public BudgetLimit(){
-
+    public BudgetLimit() {
+        // required empty
     }
 
     public BudgetLimit(String category, int amount, String id) {
         this.category = category;
-        this.id = id;
         this.amount = amount;
+        this.id = id;
+        this.month = 0;
     }
 
+    // GETTERS
     public String getCategory() {
         return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public int getAmount() {
         return amount;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public int getMonth() {
+        return month;
+    }
+
+    // SETTERS
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public void setAmount(int amount) {
         this.amount = amount;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setMonth(int month) {
+        this.month = month;
     }
 }
