@@ -14,7 +14,7 @@
         android:id="@+id/transaction_Fragment"
         android:name="com.example.financialapp.Transaction_Fragment"
         android:label="fragment_transaction_"
-        tools:layout="@layout/fragment_transaction_" />
+        tools:layout="@layout/fragment_transaction" />
     <fragment
         android:id="@+id/profile_Fragment"
         android:name="com.example.financialapp.Profile_Fragment"
