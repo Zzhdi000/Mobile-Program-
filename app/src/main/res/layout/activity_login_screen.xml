@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/bg_login"
+    android:background="@drawable/bg_login"
     android:padding="24dp"
     tools:context=".LoginScreen">
 
@@ -40,7 +40,7 @@
         app:layout_constraintTop_toBottomOf="@id/tv_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="40dp"/>
+        android:layout_marginTop="270dp"/>
 
     <!-- Password Field -->
     <EditText
@@ -82,7 +82,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Forgot Password?"
-        android:textColor="#FFFFFF"
+        android:textColor="#FFEB3B"
         android:textSize="13sp"
         app:layout_constraintTop_toBottomOf="@id/btn_Login"
         app:layout_constraintStart_toStartOf="parent"

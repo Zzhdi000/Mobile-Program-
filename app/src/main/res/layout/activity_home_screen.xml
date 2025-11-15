@@ -1,205 +1,281 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#F5F6FA"
-    android:padding="20dp"
-    android:gravity="center_horizontal">
+    android:background="#F5F6FA">
 
-    <!-- HEADER -->
-    <LinearLayout
+    <!-- Konten bisa di-scroll -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingBottom="8dp">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="My Balance"
-            android:textColor="#2C3E50"
-            android:textStyle="bold"
-            android:textSize="20sp"/>
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <!-- Menambahkan View dengan weight=1 untuk mendorong ImageView ke kanan (efek space_between) -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
+            <!-- Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_person"
-            android:background="@drawable/circleshape"
-            android:padding="6dp"/>
-    </LinearLayout>
+                <TextView
+                    android:id="@+id/tv_header_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="My Balance"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#2C3E50"/>
 
-    <!-- Saldo Total (Ditambahkan ID) -->
-    <TextView
-        android:id="@+id/TV_totalBalance"
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+                <ImageView
+                    android:id="@+id/iv_profile"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_person"
+                    android:contentDescription="Profile"
+                    android:background="@drawable/circleshape"
+                    android:padding="6dp"/>
+            </LinearLayout>
+
+            <!-- Total balance -->
+            <TextView
+                android:id="@+id/TV_totalBalance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="LKR 140,000.00"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="#2C3E50"
+                android:gravity="center"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Quick Actions (simple horizontal) -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:overScrollMode="never"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:fillViewport="false">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <!-- Action item (ganti ic icon sesuai assetmu) -->
+                    <LinearLayout
+                        android:layout_width="120dp"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="8dp">
+                        <ImageButton
+                            android:id="@+id/btn_quick_income"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:src="@drawable/ic_add"
+                            android:background="@drawable/roundconer"
+                            android:contentDescription="Tambah Income"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Income" android:textSize="12sp" android:layout_marginTop="6dp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="120dp"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="8dp">
+                        <ImageButton
+                            android:id="@+id/btn_quick_expense"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:src="@drawable/ic_remove"
+                            android:background="@drawable/roundconer"
+                            android:contentDescription="Tambah Expense"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Expense" android:textSize="12sp" android:layout_marginTop="6dp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="120dp"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="8dp">
+                        <ImageButton
+                            android:id="@+id/btn_quick_transfer"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:src="@drawable/ic_swap"
+                            android:background="@drawable/roundconer"
+                            android:contentDescription="Transfer"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Transfer" android:textSize="12sp" android:layout_marginTop="6dp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="120dp"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="8dp">
+                        <ImageButton
+                            android:id="@+id/btn_quick_scan"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:src="@drawable/ic_scan"
+                            android:background="@drawable/roundconer"
+                            android:contentDescription="Scan Receipt"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Scan" android:textSize="12sp" android:layout_marginTop="6dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- Income & Expense cards (ringkas) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:backgroundTint="#8E44AD">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Income" android:textColor="@android:color/white" android:textStyle="bold"/>
+                        <TextView android:id="@+id/TV_totalIncome" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="LKR 70,000" android:textColor="@android:color/white" android:textSize="18sp" android:layout_marginTop="6dp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    android:layout_marginStart="8dp"
+                    android:backgroundTint="#E74C3C">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Expenses" android:textColor="@android:color/white" android:textStyle="bold"/>
+                        <TextView android:id="@+id/TV_totalExpense" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="LKR 30,000" android:textColor="@android:color/white" android:textSize="18sp" android:layout_marginTop="6dp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+
+            <!-- Chart placeholder -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="3dp"
+                android:layout_marginTop="12dp">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center">
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="📊 Spending Overview (placeholder)" android:textColor="#7F8C8D"/>
+                </FrameLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Recent Transactions header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recent Transactions"
+                    android:textStyle="bold"
+                    android:textColor="#2C3E50"/>
+
+                <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
+
+                <TextView
+                    android:id="@+id/tv_see_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="See all"
+                    android:textColor="#7F8C8D"/>
+            </LinearLayout>
+
+            <!-- RecyclerView recent transactions -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_recent_transactions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="120dp"
+                android:layout_marginTop="8dp"/>
+
+            <!-- spacer so FAB won't overlap last item -->
+            <View android:layout_width="match_parent" android:layout_height="80dp"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Simple FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add"
         android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="LKR 140,000.00"
-    android:textColor="#2C3E50"
-    android:textSize="28sp"
-    android:textStyle="bold"
-    android:layout_marginBottom="24dp"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:srcCompat="@drawable/ic_add"
+        app:layout_anchor="@id/root"
+        app:layout_anchorGravity="bottom|end"
+        android:contentDescription="Tambah Transaksi"/>
 
-    <!-- INCOME & EXPENSE CARDS -->
-    <LinearLayout
+    <!-- BottomNav (simple) -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginBottom="24dp">
+        android:layout_height="56dp"
+        android:layout_gravity="bottom"
+        app:itemIconTint="@color/white"
+        app:menu="@menu/bottom_menu"/>
 
-        <!-- Income -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="6dp"
-            app:cardBackgroundColor="#8E44AD">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Income"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
-
-
-                <TextView
-                    android:id="@+id/TV_totalIncome"
-                    android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="LKR 70,000"
-                android:textColor="@android:color/white"
-                android:textSize="22sp"
-                android:layout_marginTop="4dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Last update: 18:30"
-                android:textColor="#E0E0E0"
-                android:textSize="12sp"
-                android:layout_marginTop="4dp"/>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Expense -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="6dp"
-            app:cardBackgroundColor="#E74C3C">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Expenses"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
-
-                <!-- Total Expense (Ditambahkan ID) -->
-                <TextView
-                    android:id="@+id/TV_totalExpense"
-                    android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="LKR 70,000"
-                android:textColor="@android:color/white"
-                android:textSize="22sp"
-                android:layout_marginTop="4dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Last update: 18:30"
-                android:textColor="#E0E0E0"
-                android:textSize="12sp"
-                android:layout_marginTop="4dp"/>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-    </LinearLayout>
-
-    <!-- PLACEHOLDER UNTUK CHART -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:background="@drawable/roundconer"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="16dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="📊 Spending Overview"
-        android:textSize="16sp"
-        android:textColor="#2C3E50"
-        android:textStyle="bold"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="(Chart Placeholder)"
-        android:textColor="#7F8C8D"
-        android:layout_marginTop="12dp"/>
-    </LinearLayout>
-
-    <!-- BOTTOM MENU -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginTop="32dp"
-        android:padding="8dp">
-
-        <!-- Menggunakan layout_weight=1 pada setiap ImageView untuk meniru space_evenly -->
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:src="@drawable/ic_home"
-            android:contentDescription="Home"/>
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:src="@drawable/ic_bar_chart"
-            android:contentDescription="Chart"/>
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:src="@drawable/ic_person"
-            android:contentDescription="Profile"/>
-    </LinearLayout>
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
