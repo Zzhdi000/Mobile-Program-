@@ -29,6 +29,7 @@ import java.util.Collections;
 public class Home_Fragment extends Fragment {
 
     private TextView tvTotalBalance, tvTotalIncome, tvTotalExpense;
+    private TextView tvHomeSavings;
     private ImageView ivChartPlaceholder;
 
     private ImageButton btnIncome, btnExpense, btnTransfer, btnScan;
@@ -39,7 +40,7 @@ public class Home_Fragment extends Fragment {
     private ArrayList<Datacash> recentList = new ArrayList<>();
 
     private FirebaseAuth mAuth;
-    private DatabaseReference cashRef, userRef;
+    private DatabaseReference cashRef, userRef, savingsRef;
 
     private String currency = "LKR";
 
@@ -55,6 +56,8 @@ public class Home_Fragment extends Fragment {
         tvTotalBalance = v.findViewById(R.id.TV_totalBalance);
         tvTotalIncome  = v.findViewById(R.id.TV_totalIncome);
         tvTotalExpense = v.findViewById(R.id.TV_totalExpense);
+        tvHomeSavings  = v.findViewById(R.id.tvHomeSavings);
+
         ivChartPlaceholder = v.findViewById(R.id.iv_chart_placeholder);
 
         btnIncome   = v.findViewById(R.id.btn_quick_income);
@@ -75,15 +78,16 @@ public class Home_Fragment extends Fragment {
             return v;
         }
 
-        cashRef = FirebaseDatabase.getInstance().getReference("Cashdata")
-                .child(mAuth.getCurrentUser().getUid());
+        String uid = mAuth.getCurrentUser().getUid();
 
-        userRef = FirebaseDatabase.getInstance().getReference("Users")
-                .child(mAuth.getCurrentUser().getUid());
+        cashRef = FirebaseDatabase.getInstance().getReference("Cashdata").child(uid);
+        userRef = FirebaseDatabase.getInstance().getReference("Users").child(uid);
+        savingsRef = FirebaseDatabase.getInstance().getReference("Savings").child(uid);
 
-        // FIX BESAR → muat currency dulu, baru load data
+        // LOAD CURRENCY, THEN LOAD SUMMARY AND SAVINGS
         loadCurrency();
 
+        // QUICK ACTION BUTTONS
         btnIncome.setOnClickListener(view ->
                 startActivity(new Intent(getActivity(), IncomeActivity.class)));
 
@@ -96,6 +100,7 @@ public class Home_Fragment extends Fragment {
         btnScan.setOnClickListener(view ->
                 Toast.makeText(getContext(), "Feature Coming Soon!", Toast.LENGTH_SHORT).show());
 
+        // PROFILE → buka Profile_Fragment
         ivProfile.setOnClickListener(view -> {
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).loadFragment(new Profile_Fragment());
@@ -105,28 +110,26 @@ public class Home_Fragment extends Fragment {
         return v;
     }
 
-    // ====================================
-    // FIX: LOAD CURRENCY → BARU LOAD DATA
-    // ====================================
+    // LOAD CURRENCY FIRST
     private void loadCurrency() {
-
         CurrencyHelper.getCurrency(mAuth, c -> {
             if (c != null) currency = c;
 
-            // setelah currency didapat → baru hitung income, expense, recent
+            // setelah currency siap
             loadSummary();
             loadRecentTransactions();
+            loadTotalSavings();
         });
     }
 
-    // LOAD BALANCE, INCOME, EXPENSE
+    // LOAD INCOME / EXPENSE / BALANCE
     private void loadSummary() {
         cashRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                int income = 0;
-                int expense = 0;
+                long income = 0;
+                long expense = 0;
 
                 for (DataSnapshot s : snapshot.getChildren()) {
                     Datacash d = s.getValue(Datacash.class);
@@ -151,14 +154,13 @@ public class Home_Fragment extends Fragment {
     }
 
     // CHART INDICATOR
-    private void updateChartPlaceholder(int income, int expense) {
-        if (income > expense) {
+    private void updateChartPlaceholder(long income, long expense) {
+        if (income > expense)
             ivChartPlaceholder.setImageResource(R.drawable.chart_up);
-        } else if (expense > income) {
+        else if (expense > income)
             ivChartPlaceholder.setImageResource(R.drawable.chart_down);
-        } else {
+        else
             ivChartPlaceholder.setImageResource(R.drawable.chart_equal);
-        }
     }
 
     // LOAD RECENT TRANSACTIONS
@@ -182,7 +184,26 @@ public class Home_Fragment extends Fragment {
 
                 adapter = new TransactionAdapter(getContext(), showList, currency);
                 rvRecent.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    // LOAD TOTAL SAVINGS
+    private void loadTotalSavings() {
+        savingsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                long total = 0;
+
+                for (DataSnapshot s : snapshot.getChildren()) {
+                    Savings sv = s.getValue(Savings.class);
+                    if (sv != null) total += sv.getAmount();
+                }
+
+                tvHomeSavings.setText(currency + " " + total);
             }
 
             @Override

@@ -8,15 +8,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FinancialApp">
+
         <activity
             android:name=".SetlimitActivity"
             android:exported="false" />
+
         <activity
             android:name=".SignInActivity"
             android:exported="false" />
+
         <activity
             android:name=".ExpenseActivity"
             android:exported="false" />
+
         <activity
             android:name=".IncomeActivity"
             android:exported="false"
@@ -25,18 +29,26 @@
         <activity
             android:name=".home_screen"
             android:exported="false" />
+
+        <activity
+            android:name=".SavingsActivity"
+            android:exported="false" />
+
         <activity
             android:name=".MainActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
+
         <activity
             android:name=".LoginScreen"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
+
     </application>
 
 </manifest>

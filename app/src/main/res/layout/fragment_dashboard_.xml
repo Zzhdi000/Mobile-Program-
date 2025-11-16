@@ -196,6 +196,141 @@
                 android:layout_marginTop="8dp"/>
         </LinearLayout>
 
+        <!-- =================== BILLS =================== -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:elevation="3dp"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bills"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#2C3E50"/>
+
+            <TextView
+                android:id="@+id/tvBillsLimit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Limit: LKR 0"
+                android:textSize="14sp"
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:id="@+id/tvBillsUsed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Used: LKR 0"
+                android:textSize="14sp"
+                android:textColor="#E67E22"
+                android:layout_marginTop="2dp"/>
+
+            <ProgressBar
+                android:id="@+id/pbBills"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:max="100"
+                android:progress="0"
+                android:layout_marginTop="8dp"/>
+        </LinearLayout>
+
+        <!-- =================== SHOPPING =================== -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:elevation="3dp"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Shopping"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#2C3E50"/>
+
+            <TextView
+                android:id="@+id/tvShoppingLimit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Limit: LKR 0"
+                android:textSize="14sp"
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:id="@+id/tvShoppingUsed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Used: LKR 0"
+                android:textSize="14sp"
+                android:textColor="#E67E22"
+                android:layout_marginTop="2dp"/>
+
+            <ProgressBar
+                android:id="@+id/pbShopping"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:max="100"
+                android:progress="0"
+                android:layout_marginTop="8dp"/>
+        </LinearLayout>
+
+        <!-- =================== TRANSPORT =================== -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:elevation="3dp"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Transport"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#2C3E50"/>
+
+            <TextView
+                android:id="@+id/tvTransportLimit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Limit: LKR 0"
+                android:textSize="14sp"
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:id="@+id/tvTransportUsed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Used: LKR 0"
+                android:textSize="14sp"
+                android:textColor="#E67E22"
+                android:layout_marginTop="2dp"/>
+
+            <ProgressBar
+                android:id="@+id/pbTransport"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:max="100"
+                android:progress="0"
+                android:layout_marginTop="8dp"/>
+        </LinearLayout>
+
 
         <!-- =================== OTHER =================== -->
         <LinearLayout

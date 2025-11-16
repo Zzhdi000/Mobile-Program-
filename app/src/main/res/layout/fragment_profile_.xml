@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -20,7 +21,6 @@
             android:background="@drawable/rounded_input"
             android:scaleType="centerCrop"/>
 
-        <!-- Nama -->
         <TextView
             android:id="@+id/tvUserName"
             android:layout_width="wrap_content"
@@ -30,14 +30,15 @@
             android:textStyle="bold"
             android:layout_marginTop="10dp" />
 
-        <!-- Garis -->
+        <!-- Divider -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="20dp"
             android:background="#DADADA"/>
 
-        <!-- History -->
+
+        <!-- HISTORY TITLE -->
         <TextView
             android:id="@+id/tvHistory"
             android:layout_width="match_parent"
@@ -45,7 +46,8 @@
             android:text="History"
             android:layout_marginTop="15dp"
             android:textSize="14sp" />
-        <!-- ================= HISTORY SUBMENU ================= -->
+
+        <!-- HISTORY MENU -->
         <LinearLayout
             android:id="@+id/layoutHistoryMenu"
             android:layout_width="match_parent"
@@ -84,25 +86,33 @@
 
         </LinearLayout>
 
-        <!-- Settings -->
-        <TextView
-            android:id="@+id/tvSettings"
+        <!-- SAVINGS SECTION -->
+        <LinearLayout
+            android:id="@+id/btnSavings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Settings"
-            android:layout_marginTop="10dp"
-            android:textSize="14sp" />
+            android:padding="10dp"
+            android:orientation="horizontal">
 
-        <!-- Edit -->
+            <TextView
+                android:id="@+id/tvSavings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Savings"
+                android:textSize="15sp"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <!-- FEEDBACK -->
         <TextView
-            android:id="@+id/tvEdit"
+            android:id="@+id/tvFeedback"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Edit"
-            android:layout_marginTop="10dp"
-            android:textSize="14sp" />
+            android:text="Feedback"
+            android:textSize="14sp"
+            android:paddingTop="12dp" />
 
-        <!-- Currency Change -->
+        <!-- CURRENCY SPINNER -->
         <Spinner
             android:id="@+id/spCurrency"
             android:layout_width="match_parent"
@@ -111,7 +121,7 @@
             android:padding="10dp"
             android:background="@drawable/spinner_bg"/>
 
-        <!-- Logout -->
+        <!-- LOGOUT -->
         <TextView
             android:id="@+id/tvLogout"
             android:layout_width="match_parent"
@@ -122,6 +132,6 @@
             android:gravity="center"
             android:layout_marginTop="25dp"
             android:padding="10dp"/>
-
     </LinearLayout>
+
 </ScrollView>

@@ -1,7 +1,9 @@
 package com.example.financialapp;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -12,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -20,6 +22,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class Dashboard_Fragment extends Fragment {
 
@@ -43,6 +50,17 @@ public class Dashboard_Fragment extends Fragment {
     private ProgressBar pbOther;
 
     private CardView cardSetLimit;
+    private TextView tvBillsLimit, tvBillsUsed;
+    private ProgressBar pbBills;
+
+    private TextView tvShoppingLimit, tvShoppingUsed;
+    private ProgressBar pbShopping;
+
+    private TextView tvTransportLimit, tvTransportUsed;
+    private ProgressBar pbTransport;
+
+    // Anti-spam popup
+    private SharedPreferences prefs;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -52,11 +70,6 @@ public class Dashboard_Fragment extends Fragment {
 
         mAuth = FirebaseAuth.getInstance();
 
-        if (mAuth.getCurrentUser() == null) {
-            Toast.makeText(getContext(), "Please login again.", Toast.LENGTH_SHORT).show();
-            return v;
-        }
-
         cashRef = FirebaseDatabase.getInstance()
                 .getReference("Cashdata")
                 .child(mAuth.getCurrentUser().getUid());
@@ -64,6 +77,9 @@ public class Dashboard_Fragment extends Fragment {
         limitRef = FirebaseDatabase.getInstance()
                 .getReference("BudgetLimit")
                 .child(mAuth.getCurrentUser().getUid());
+
+        // SharedPreferences
+        prefs = requireActivity().getSharedPreferences("LimitPopup", requireContext().MODE_PRIVATE);
 
         tvTotalIncome = v.findViewById(R.id.TV_totalIncome);
         tvTotalExpense = v.findViewById(R.id.TV_totalExpense);
@@ -80,6 +96,18 @@ public class Dashboard_Fragment extends Fragment {
         tvHealthUsed = v.findViewById(R.id.tvHealthUsed);
         pbHealth = v.findViewById(R.id.pbHealth);
 
+        tvBillsLimit = v.findViewById(R.id.tvBillsLimit);
+        tvBillsUsed = v.findViewById(R.id.tvBillsUsed);
+        pbBills = v.findViewById(R.id.pbBills);
+
+        tvShoppingLimit = v.findViewById(R.id.tvShoppingLimit);
+        tvShoppingUsed = v.findViewById(R.id.tvShoppingUsed);
+        pbShopping = v.findViewById(R.id.pbShopping);
+
+        tvTransportLimit = v.findViewById(R.id.tvTransportLimit);
+        tvTransportUsed = v.findViewById(R.id.tvTransportUsed);
+        pbTransport = v.findViewById(R.id.pbTransport);
+
         tvOtherLimit = v.findViewById(R.id.tvOtherLimit);
         tvOtherUsed = v.findViewById(R.id.tvOtherUsed);
         pbOther = v.findViewById(R.id.pbOther);
@@ -92,6 +120,12 @@ public class Dashboard_Fragment extends Fragment {
         loadCurrency();
 
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        checkLimitWarning();
     }
 
     private void loadCurrency() {
@@ -125,9 +159,7 @@ public class Dashboard_Fragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Firebase error", Toast.LENGTH_SHORT).show();
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
@@ -135,92 +167,53 @@ public class Dashboard_Fragment extends Fragment {
         loadLimit("food", tvFoodLimit, tvFoodUsed, pbFood);
         loadLimit("utility", tvUtilityLimit, tvUtilityUsed, pbUtility);
         loadLimit("health", tvHealthLimit, tvHealthUsed, pbHealth);
+        loadLimit("bills", tvBillsLimit, tvBillsUsed, pbBills);
+        loadLimit("shopping", tvShoppingLimit, tvShoppingUsed, pbShopping);
+        loadLimit("transport", tvTransportLimit, tvTransportUsed, pbTransport);
         loadLimit("other", tvOtherLimit, tvOtherUsed, pbOther);
     }
 
     private void loadLimit(String category, TextView tvLimit, TextView tvUsed, ProgressBar pb) {
-
         limitRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snap) {
+            @Override public void onDataChange(@NonNull DataSnapshot snap) {
 
                 int limit = 0;
 
                 for (DataSnapshot s : snap.getChildren()) {
                     BudgetLimit bl = s.getValue(BudgetLimit.class);
-                    if (bl == null || bl.getCategory() == null) continue;
-
-                    if (category.equalsIgnoreCase(bl.getCategory()))
+                    if (bl != null && category.equalsIgnoreCase(bl.getCategory()))
                         limit = bl.getAmount();
                 }
 
                 tvLimit.setText("Limit: " + currency + " " + limit);
+
                 int finalLimit = limit;
 
                 cashRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot s2) {
+                    @Override public void onDataChange(@NonNull DataSnapshot s2) {
 
                         int used = 0;
 
                         for (DataSnapshot s : s2.getChildren()) {
                             Datacash d = s.getValue(Datacash.class);
-                            if (d == null || d.getCategory() == null) continue;
 
-                            if ("expense".equals(d.getType()) &&
-                                    category.equalsIgnoreCase(d.getCategory()))
+                            if (d != null &&
+                                    "expense".equals(d.getType()) &&
+                                    category.equalsIgnoreCase(d.getCategory())) {
+
                                 used += d.getAmount();
+                            }
                         }
 
                         tvUsed.setText("Used: " + currency + " " + used);
-
-                        // =====================================================
-                        //     WARNING + DISABLE SET LIMIT (AMANKAN)
-                        // =====================================================
-
-                        if (finalLimit > 0 && used >= finalLimit) {
-
-                            // Disable tombol Set Limit
-                            cardSetLimit.setEnabled(false);
-                            cardSetLimit.setAlpha(0.5f);
-
-                            // Tampilkan 1x/hari
-                            if (getContext() != null &&
-                                    LimitWarningHelper.shouldShow(getContext(), category)) {
-
-                                Toast.makeText(
-                                        getContext(),
-                                        "Warning: limit for " + category + " reached!",
-                                        Toast.LENGTH_SHORT
-                                ).show();
-
-                                if (getActivity() != null && isAdded()) {
-                                    new androidx.appcompat.app.AlertDialog.Builder(getContext())
-                                            .setTitle("Limit Reached")
-                                            .setMessage("You have reached the limit for " + category + ".")
-                                            .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
-                                            .show();
-                                }
-
-                                LimitWarningHelper.setShown(getContext(), category);
-                            }
-
-                        } else {
-                            // Limit BELUM tercapai → tombol aktif normal
-                            cardSetLimit.setEnabled(true);
-                            cardSetLimit.setAlpha(1f);
-                        }
-
                         updateProgressBar(finalLimit, used, pb);
                     }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {}
+                    @Override public void onCancelled(@NonNull DatabaseError error) {}
                 });
             }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
@@ -243,5 +236,84 @@ public class Dashboard_Fragment extends Fragment {
                 pb.getProgressDrawable().setTint(Color.parseColor("#E74C3C"));
 
         } catch (Exception ignored) {}
+    }
+
+    // ==========================================================================
+    //                         LIMIT WARNING POPUP (ANTI SPAM)
+    // ==========================================================================
+    private void checkLimitWarning() {
+
+        int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+
+        limitRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot limitSnap) {
+
+                for (DataSnapshot L : limitSnap.getChildren()) {
+
+                    BudgetLimit bl = L.getValue(BudgetLimit.class);
+                    if (bl == null) continue;
+
+                    String category = bl.getCategory();
+                    int setLimit = bl.getAmount();
+
+                    cashRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override public void onDataChange(@NonNull DataSnapshot cashSnap) {
+
+                            int used = 0;
+
+                            for (DataSnapshot c : cashSnap.getChildren()) {
+                                Datacash d = c.getValue(Datacash.class);
+
+                                if (d != null &&
+                                        d.getMonth() == month &&
+                                        "expense".equals(d.getType()) &&
+                                        category.equalsIgnoreCase(d.getCategory())) {
+
+                                    used += d.getAmount();
+                                }
+                            }
+
+                            if (used >= setLimit && setLimit > 0) {
+                                if (shouldShowPopup(category)) {
+                                    showPopup(category, setLimit, used);
+                                    disablePopupForToday(category);
+                                }
+                            }
+                        }
+
+                        @Override public void onCancelled(@NonNull DatabaseError error) {}
+                    });
+                }
+            }
+
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    private void showPopup(String category, int limit, int used) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("⚠ Limit Reached")
+                .setMessage(
+                        "Your " + category + " spending has reached the limit.\n\n" +
+                                "Limit : " + currency + " " + limit + "\n" +
+                                "Current: " + currency + " " + used
+                )
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
+    private boolean shouldShowPopup(String category) {
+        String key = category + "_" + getToday();
+        return prefs.getBoolean(key, true);
+    }
+
+    private void disablePopupForToday(String category) {
+        String key = category + "_" + getToday();
+        prefs.edit().putBoolean(key, false).apply();
+    }
+
+    private String getToday() {
+        return new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+                .format(new Date());
     }
 }

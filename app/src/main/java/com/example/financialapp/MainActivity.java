@@ -26,18 +26,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // =====================================================
-        // FIX PALING PENTING : CEK LOGIN DULU
-        // =====================================================
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
         if (mAuth.getCurrentUser() == null) {
             startActivity(new Intent(MainActivity.this, LoginScreen.class));
             finish();
-            return; // Hentikan jalan ke bawah
+            return;
         }
-
-        // =====================================================
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 

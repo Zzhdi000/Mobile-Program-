@@ -12,7 +12,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -34,8 +33,8 @@ public class ExpenseActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private DatabaseReference cashRef;
-    private String currency = "LKR";
 
+    private String currency = "LKR";
     private boolean isEditing = false;
 
     @Override
@@ -58,9 +57,6 @@ public class ExpenseActivity extends AppCompatActivity {
         btnAdd.setOnClickListener(v -> saveExpense());
     }
 
-    // ==========================
-    // LOAD CURRENCY (FIXED)
-    // ==========================
     private void loadCurrency() {
         FirebaseDatabase.getInstance().getReference("Users")
                 .child(mAuth.getCurrentUser().getUid())
@@ -71,8 +67,7 @@ public class ExpenseActivity extends AppCompatActivity {
                         if (s.exists()) currency = s.getValue(String.class);
                     }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) { }
+                    @Override public void onCancelled(@NonNull DatabaseError error) {}
                 });
     }
 
@@ -86,11 +81,9 @@ public class ExpenseActivity extends AppCompatActivity {
         categories.add("Health");
         categories.add("Other");
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_dropdown_item,
-                categories
-        );
+        ArrayAdapter<String> adapter =
+                new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, categories);
+
         spinnerCategory.setAdapter(adapter);
     }
 
@@ -106,7 +99,9 @@ public class ExpenseActivity extends AppCompatActivity {
                 isEditing = true;
 
                 try {
+
                     String clean = s.toString().replace(".", "");
+
                     if (clean.isEmpty()) {
                         isEditing = false;
                         return;
@@ -115,6 +110,7 @@ public class ExpenseActivity extends AppCompatActivity {
                     long parsed = Long.parseLong(clean);
                     DecimalFormat df = new DecimalFormat("#,###");
                     String formatted = df.format(parsed).replace(",", ".");
+
                     etAmount.setText(formatted);
                     etAmount.setSelection(formatted.length());
 
@@ -136,7 +132,9 @@ public class ExpenseActivity extends AppCompatActivity {
         int amount = Integer.parseInt(amountStr);
         String category = spinnerCategory.getSelectedItem().toString();
 
-        String date = new SimpleDateFormat("dd-MM-yyyy").format(Calendar.getInstance().getTime());
+        String date = new SimpleDateFormat("dd-MM-yyyy")
+                .format(Calendar.getInstance().getTime());
+
         int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
 
         String id = cashRef.push().getKey();
@@ -152,9 +150,11 @@ public class ExpenseActivity extends AppCompatActivity {
 
         d.setCurrency(currency);
 
-        cashRef.child(id).setValue(d).addOnCompleteListener(t -> {
-            Toast.makeText(this, "Expense added", Toast.LENGTH_SHORT).show();
-            finish();
-        });
+        cashRef.child(id)
+                .setValue(d)
+                .addOnCompleteListener(task -> {
+                    Toast.makeText(this, "Expense added", Toast.LENGTH_SHORT).show();
+                    finish();
+                });
     }
 }

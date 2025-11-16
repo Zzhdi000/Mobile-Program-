@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F7F7FB">
+
+    <!-- Title / Total -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Savings"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#2C3E50"/>
+
+    <TextView
+        android:id="@+id/tvTotalSavings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="IDR 0"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="#6C5CE7"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Input panel -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp">
+
+        <EditText
+            android:id="@+id/etSaveAmount"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:hint="Enter amount..."
+            android:background="@drawable/rounded_input"
+            android:paddingHorizontal="12dp"
+            android:inputType="number"/>
+
+        <Button
+            android:id="@+id/btnAddSave"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="SAVE"
+            android:layout_marginStart="8dp"
+            android:background="#6C5CE7"
+            android:textColor="@android:color/white"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnWithdraw"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:text="Withdraw"
+        android:layout_marginTop="8dp"
+        android:background="#E74C3C"
+        android:textColor="@android:color/white"
+        android:visibility="gone"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="12dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="History"
+        android:textStyle="bold"
+        android:textSize="16sp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvSavings"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="4dp"/>
+
+</LinearLayout>

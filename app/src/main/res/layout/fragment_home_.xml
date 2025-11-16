@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     android:background="#F5F6FA">
 
-    <!-- Scrollable content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -45,17 +44,17 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:src="@drawable/ic_person"
-                    android:contentDescription="Profile"
                     android:background="@drawable/circleshape"
+                    android:contentDescription="Profile"
                     android:padding="6dp"/>
             </LinearLayout>
 
-            <!-- Total balance -->
+            <!-- Total Balance -->
             <TextView
                 android:id="@+id/TV_totalBalance"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="LKR 0.00"
+                android:text="LKR 0"
                 android:textSize="28sp"
                 android:textStyle="bold"
                 android:textColor="#2C3E50"
@@ -69,8 +68,7 @@
                 android:layout_height="72dp"
                 android:overScrollMode="never"
                 android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:fillViewport="false">
+                android:paddingBottom="4dp">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -91,8 +89,7 @@
                             android:layout_width="56dp"
                             android:layout_height="56dp"
                             android:src="@drawable/ic_add"
-                            android:background="@drawable/roundconer"
-                            android:contentDescription="Tambah Income"/>
+                            android:background="@drawable/roundconer"/>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -115,8 +112,7 @@
                             android:layout_width="56dp"
                             android:layout_height="56dp"
                             android:src="@drawable/ic_remove"
-                            android:background="@drawable/roundconer"
-                            android:contentDescription="Tambah Expense"/>
+                            android:background="@drawable/roundconer"/>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -139,8 +135,7 @@
                             android:layout_width="56dp"
                             android:layout_height="56dp"
                             android:src="@drawable/ic_swap"
-                            android:background="@drawable/roundconer"
-                            android:contentDescription="Transfer"/>
+                            android:background="@drawable/roundconer"/>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -163,8 +158,7 @@
                             android:layout_width="44dp"
                             android:layout_height="44dp"
                             android:src="@drawable/ic_scan"
-                            android:background="@drawable/roundconer"
-                            android:contentDescription="Scan Receipt"/>
+                            android:background="@drawable/roundconer"/>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -177,7 +171,7 @@
                 </LinearLayout>
             </HorizontalScrollView>
 
-            <!-- Income & Expense Cards -->
+            <!-- Income Expense -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -185,13 +179,12 @@
                 android:layout_marginTop="12dp">
 
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/cardIncome"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="4dp"
-                    android:layout_marginEnd="8dp"
                     android:backgroundTint="#8E44AD">
 
                     <LinearLayout
@@ -201,31 +194,29 @@
                         android:padding="12dp">
 
                         <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
                             android:text="Income"
                             android:textColor="@android:color/white"
-                            android:textStyle="bold"/>
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
 
                         <TextView
                             android:id="@+id/TV_totalIncome"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="LKR 0"
                             android:textColor="@android:color/white"
                             android:textSize="18sp"
-                            android:layout_marginTop="6dp"/>
+                            android:text="LKR 0"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/cardExpense"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_marginStart="8dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="4dp"
-                    android:layout_marginStart="8dp"
                     android:backgroundTint="#E74C3C">
 
                     <LinearLayout
@@ -235,25 +226,53 @@
                         android:padding="12dp">
 
                         <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Expenses"
+                            android:text="Expense"
                             android:textColor="@android:color/white"
-                            android:textStyle="bold"/>
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
 
                         <TextView
                             android:id="@+id/TV_totalExpense"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="LKR 0"
                             android:textColor="@android:color/white"
                             android:textSize="18sp"
-                            android:layout_marginTop="6dp"/>
+                            android:text="LKR 0"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
             </LinearLayout>
 
-            <!-- Chart placeholder -->
+            <!-- Savings -->
+            <LinearLayout
+                android:id="@+id/cardSavings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/rounded_card"
+                android:padding="16dp">
+
+                <TextView
+                    android:text="Savings"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#2C3E50"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/tvHomeSavings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="IDR 0"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#6C5CE7"
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <!-- Chart -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="160dp"
@@ -275,14 +294,13 @@
                 </FrameLayout>
             </androidx.cardview.widget.CardView>
 
-
-            <!-- Recent -->
+            <!-- Recent Transactions -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="12dp">
+                android:layout_marginTop="12dp"
+                android:gravity="center_vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -300,11 +318,11 @@
                     android:id="@+id/tv_see_all"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="See all"
+                    android:text="See All"
                     android:textColor="#7F8C8D"/>
             </LinearLayout>
 
-            <!-- RecyclerView -->
+            <!-- Recycler -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_recent_transactions"
                 android:layout_width="match_parent"
@@ -314,9 +332,6 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="80dp"/>
-
         </LinearLayout>
-
     </androidx.core.widget.NestedScrollView>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

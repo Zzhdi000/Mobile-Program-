@@ -22,20 +22,29 @@ import java.util.Calendar;
 
 public class SetlimitActivity extends AppCompatActivity {
 
-    EditText etFood, etUtility, etHealth, etOther;
-    Button btnFood, btnUtility, btnHealth, btnOther;
+    // INPUT
+    EditText etFood, etBills, etShopping, etTransport, etUtility, etHealth, etOther;
 
-    TextView tvFoodCurrent, tvUtilityCurrent, tvHealthCurrent, tvOtherCurrent;
+    // BUTTONS
+    Button btnFood, btnBills, btnShopping, btnTransport, btnUtility, btnHealth, btnOther;
 
-    CardView cardFood, cardUtility, cardHealth, cardOther;
+    // TEXT CURRENT LIMITS
+    TextView tvFoodCurrent, tvBillsCurrent, tvShoppingCurrent, tvTransportCurrent,
+            tvUtilityCurrent, tvHealthCurrent, tvOtherCurrent;
 
+    // CARDS FOR DOUBLE TAP RESET
+    CardView cardFood, cardBills, cardShopping, cardTransport, cardUtility, cardHealth, cardOther;
+
+    // FIREBASE
     DatabaseReference dbRef, userRef;
     FirebaseAuth mAuth;
 
     String currency = "LKR";
     int currentMonth;
 
-    long lastTapFood = 0, lastTapUtility = 0, lastTapHealth = 0, lastTapOther = 0;
+    // DOUBLE TAP TIMERS
+    long lastTapFood = 0, lastTapBills = 0, lastTapShopping = 0,
+            lastTapTransport = 0, lastTapUtility = 0, lastTapHealth = 0, lastTapOther = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,42 +65,61 @@ public class SetlimitActivity extends AppCompatActivity {
 
         loadCurrency();
 
-        // INPUT
+        // ========== INPUT FIELDS ==========
         etFood = findViewById(R.id.et_setLimitFood);
+        etBills = findViewById(R.id.et_setLimitBills);
+        etShopping = findViewById(R.id.et_setLimitShopping);
+        etTransport = findViewById(R.id.et_setLimitTransport);
         etUtility = findViewById(R.id.et_setLimitUtility);
         etHealth = findViewById(R.id.et_setLimitHealth);
         etOther = findViewById(R.id.et_setLimitOther);
 
-        // BUTTONS
+        // ========== BUTTON ID ==========
         btnFood = findViewById(R.id.btn_addFood);
+        btnBills = findViewById(R.id.btn_addBills);
+        btnShopping = findViewById(R.id.btn_addShopping);
+        btnTransport = findViewById(R.id.btn_addTransport);
         btnUtility = findViewById(R.id.btn_addUtility);
         btnHealth = findViewById(R.id.btn_addHealth);
         btnOther = findViewById(R.id.btn_addOther);
 
-        // CURRENT DISPLAY
+        // ========== CURRENT TEXTVIEW ID ==========
         tvFoodCurrent = findViewById(R.id.amountCurrent_food);
+        tvBillsCurrent = findViewById(R.id.amountCurrent_bills);
+        tvShoppingCurrent = findViewById(R.id.amountCurrent_shopping);
+        tvTransportCurrent = findViewById(R.id.amountCurrent_transport);
         tvUtilityCurrent = findViewById(R.id.amountCurrent_Utility);
         tvHealthCurrent = findViewById(R.id.amountCurrent_health);
         tvOtherCurrent = findViewById(R.id.amountCurrent_Other);
 
-        // CARDS (PASTIKAN ADA ID DI XML)
+        // ========== CARD ID ==========
         cardFood = findViewById(R.id.cardFood);
+        cardBills = findViewById(R.id.cardBills);
+        cardShopping = findViewById(R.id.cardShopping);
+        cardTransport = findViewById(R.id.cardTransport);
         cardUtility = findViewById(R.id.cardUtility);
         cardHealth = findViewById(R.id.cardHealth);
         cardOther = findViewById(R.id.cardOther);
 
-        // SAVE HANDLER
+        // ========== SAVE BUTTON HANDLER ==========
         btnFood.setOnClickListener(v -> save("food", etFood, btnFood));
+        btnBills.setOnClickListener(v -> save("bills", etBills, btnBills));
+        btnShopping.setOnClickListener(v -> save("shopping", etShopping, btnShopping));
+        btnTransport.setOnClickListener(v -> save("transport", etTransport, btnTransport));
         btnUtility.setOnClickListener(v -> save("utility", etUtility, btnUtility));
         btnHealth.setOnClickListener(v -> save("health", etHealth, btnHealth));
         btnOther.setOnClickListener(v -> save("other", etOther, btnOther));
 
-        // DOUBLE TAP RESET
+        // ========== ENABLE DOUBLE TAP RESET ==========
         enableDoubleTapReset(cardFood, "food", tvFoodCurrent, btnFood, 1);
-        enableDoubleTapReset(cardUtility, "utility", tvUtilityCurrent, btnUtility, 2);
-        enableDoubleTapReset(cardHealth, "health", tvHealthCurrent, btnHealth, 3);
-        enableDoubleTapReset(cardOther, "other", tvOtherCurrent, btnOther, 4);
+        enableDoubleTapReset(cardBills, "bills", tvBillsCurrent, btnBills, 2);
+        enableDoubleTapReset(cardShopping, "shopping", tvShoppingCurrent, btnShopping, 3);
+        enableDoubleTapReset(cardTransport, "transport", tvTransportCurrent, btnTransport, 4);
+        enableDoubleTapReset(cardUtility, "utility", tvUtilityCurrent, btnUtility, 5);
+        enableDoubleTapReset(cardHealth, "health", tvHealthCurrent, btnHealth, 6);
+        enableDoubleTapReset(cardOther, "other", tvOtherCurrent, btnOther, 7);
 
+        // ========== LOAD INITIAL LIMITS ==========
         loadCurrentLimits();
     }
 
@@ -131,7 +159,7 @@ public class SetlimitActivity extends AppCompatActivity {
                 });
     }
 
-    // ========================= LOAD LIMIT TABLE =========================
+    // ========================= LOAD LIMITS =========================
     private void loadCurrentLimits() {
 
         dbRef.addValueEventListener(new ValueEventListener() {
@@ -142,24 +170,42 @@ public class SetlimitActivity extends AppCompatActivity {
                     BudgetLimit bl = s.getValue(BudgetLimit.class);
                     if (bl == null) continue;
 
-                    if (bl.getCategory().equals("food")) {
-                        tvFoodCurrent.setText(currency + " " + bl.getAmount());
-                        updateButtonState(btnFood, bl);
-                    }
+                    switch (bl.getCategory()) {
 
-                    if (bl.getCategory().equals("utility")) {
-                        tvUtilityCurrent.setText(currency + " " + bl.getAmount());
-                        updateButtonState(btnUtility, bl);
-                    }
+                        case "food":
+                            tvFoodCurrent.setText(currency + " " + bl.getAmount());
+                            updateButtonState(btnFood, bl);
+                            break;
 
-                    if (bl.getCategory().equals("health")) {
-                        tvHealthCurrent.setText(currency + " " + bl.getAmount());
-                        updateButtonState(btnHealth, bl);
-                    }
+                        case "bills":
+                            tvBillsCurrent.setText(currency + " " + bl.getAmount());
+                            updateButtonState(btnBills, bl);
+                            break;
 
-                    if (bl.getCategory().equals("other")) {
-                        tvOtherCurrent.setText(currency + " " + bl.getAmount());
-                        updateButtonState(btnOther, bl);
+                        case "shopping":
+                            tvShoppingCurrent.setText(currency + " " + bl.getAmount());
+                            updateButtonState(btnShopping, bl);
+                            break;
+
+                        case "transport":
+                            tvTransportCurrent.setText(currency + " " + bl.getAmount());
+                            updateButtonState(btnTransport, bl);
+                            break;
+
+                        case "utility":
+                            tvUtilityCurrent.setText(currency + " " + bl.getAmount());
+                            updateButtonState(btnUtility, bl);
+                            break;
+
+                        case "health":
+                            tvHealthCurrent.setText(currency + " " + bl.getAmount());
+                            updateButtonState(btnHealth, bl);
+                            break;
+
+                        case "other":
+                            tvOtherCurrent.setText(currency + " " + bl.getAmount());
+                            updateButtonState(btnOther, bl);
+                            break;
                     }
                 }
             }
@@ -168,7 +214,7 @@ public class SetlimitActivity extends AppCompatActivity {
         });
     }
 
-    // ========================= DISABLE MONTH LOCK =========================
+    // ========================= DISABLE BUTTON IF SAME MONTH =========================
     private void updateButtonState(Button btn, BudgetLimit bl) {
         if (bl.getMonth() == currentMonth) {
             btn.setEnabled(false);
@@ -187,15 +233,15 @@ public class SetlimitActivity extends AppCompatActivity {
             long now = System.currentTimeMillis();
             boolean doubleTap = false;
 
-            if (code == 1 && now - lastTapFood < 300) doubleTap = true;
-            if (code == 2 && now - lastTapUtility < 300) doubleTap = true;
-            if (code == 3 && now - lastTapHealth < 300) doubleTap = true;
-            if (code == 4 && now - lastTapOther < 300) doubleTap = true;
-
-            if (code == 1) lastTapFood = now;
-            if (code == 2) lastTapUtility = now;
-            if (code == 3) lastTapHealth = now;
-            if (code == 4) lastTapOther = now;
+            switch (code) {
+                case 1: doubleTap = (now - lastTapFood < 300); lastTapFood = now; break;
+                case 2: doubleTap = (now - lastTapBills < 300); lastTapBills = now; break;
+                case 3: doubleTap = (now - lastTapShopping < 300); lastTapShopping = now; break;
+                case 4: doubleTap = (now - lastTapTransport < 300); lastTapTransport = now; break;
+                case 5: doubleTap = (now - lastTapUtility < 300); lastTapUtility = now; break;
+                case 6: doubleTap = (now - lastTapHealth < 300); lastTapHealth = now; break;
+                case 7: doubleTap = (now - lastTapOther < 300); lastTapOther = now; break;
+            }
 
             if (doubleTap) {
                 showResetDialog(category, tv, btn);
