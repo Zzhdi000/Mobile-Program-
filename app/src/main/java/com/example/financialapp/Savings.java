@@ -6,19 +6,19 @@ public class Savings {
     private long amount;
     private String date;
     private int month;
-    private String note;
+    private String type; // NEW: in / out
 
     public Savings() {
         // required for Firebase
     }
 
     // Constructor that your code in SavingsActivity uses:
-    public Savings(String id, long amount, String date, int month, String note) {
+    public Savings(String id, long amount, String date, int month, String type) {
         this.id = id;
         this.amount = amount;
         this.date = date;
         this.month = month;
-        this.note = note;
+        this.type = type;
     }
 
     // --- Getter used by Adapter ---
@@ -26,12 +26,12 @@ public class Savings {
     public long getAmount() { return amount; }
     public String getDate() { return date; }
     public int getMonth() { return month; }
-    public String getNote() { return note; }
+    public String getNote() { return type; }
 
     // --- Setter if firebase needs it ---
     public void setId(String id) { this.id = id; }
     public void setAmount(long amount) { this.amount = amount; }
     public void setDate(String date) { this.date = date; }
     public void setMonth(int month) { this.month = month; }
-    public void setNote(String note) { this.note = note; }
+    public void setNote(String note) { this.type = type; }
 }

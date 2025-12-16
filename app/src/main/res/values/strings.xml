@@ -1,5 +1,16 @@
 <resources>
-    <string name="app_name">Financial App</string>
+    <string name="app_name">Money Sack</string>
+    <string name="my_balance">My Balance</string>
+    <string name="profile">Profile</string>
+    <string name="notification_icon">Notification</string>
+    <string name="income">Income</string>
+    <string name="expense">Expense</string>
+    <string name="transfer">Transfer</string>
+    <string name="scan">Scan</string>
+    <string name="expenses">Expenses</string>
+    <string name="savings">Savings</string>
+    <string name="recent_transactions">Recent Transactions</string>
+    <string name="see_all">See All</string>
 
     <string-array name="categoryList">
         <item>Select Item</item>

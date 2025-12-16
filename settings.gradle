@@ -3,14 +3,18 @@ pluginManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
+        maven { url 'https://jitpack.io' }   // <-- TAMBAHKAN DI SINI
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://jitpack.io' }   // <-- DAN DI SINI
     }
 }
+
 rootProject.name = "Financial App"
 include ':app'

@@ -20,10 +20,12 @@ import java.util.*;
 public class WeeklyHistoryBottomSheet extends BottomSheetDialogFragment {
 
     private RecyclerView rv;
-    private ArrayList<Datacash> list = new ArrayList<>();
+    private ArrayList<Object> finalList = new ArrayList<>();
 
     private FirebaseAuth mAuth;
-    private DatabaseReference cashRef;
+    private DatabaseReference cashRef, userRef;
+
+    private String currency = "IDR";
 
     @Nullable
     @Override
@@ -37,20 +39,36 @@ public class WeeklyHistoryBottomSheet extends BottomSheetDialogFragment {
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
 
         mAuth = FirebaseAuth.getInstance();
+        String uid = mAuth.getCurrentUser().getUid();
+
         cashRef = FirebaseDatabase.getInstance()
                 .getReference("Cashdata")
-                .child(mAuth.getCurrentUser().getUid());
+                .child(uid);
 
-        loadWeekly();
+        userRef = FirebaseDatabase.getInstance()
+                .getReference("Users")
+                .child(uid);
+
+        loadCurrencyThenWeekly();
 
         return v;
     }
 
+    private void loadCurrencyThenWeekly() {
+        userRef.child("currency").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot ds) {
+                if (ds.exists()) currency = ds.getValue(String.class);
+                loadWeekly();
+            }
+            @Override public void onCancelled(@NonNull DatabaseError e) {}
+        });
+    }
+
     private void loadWeekly() {
 
-        Calendar c = Calendar.getInstance();
-        c.add(Calendar.DAY_OF_YEAR, -7);
-        Date lastWeekDate = c.getTime();
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_YEAR, -7);
+        Date last7 = cal.getTime();
 
         SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
 
@@ -58,24 +76,26 @@ public class WeeklyHistoryBottomSheet extends BottomSheetDialogFragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snap) {
 
-                list.clear();
+                finalList.clear();
+                finalList.add(new HistoryHeader("Last 7 Days"));
 
                 for (DataSnapshot s : snap.getChildren()) {
+
                     Datacash d = s.getValue(Datacash.class);
                     if (d == null) continue;
 
                     try {
-                        Date dDate = df.parse(d.getDate());
-                        if (dDate != null && !dDate.before(lastWeekDate)) {
-                            list.add(d);
+                        Date date = df.parse(d.getDate());
+                        if (date != null && !date.before(last7)) {
+                            finalList.add(d);
                         }
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignore) {}
                 }
 
-                rv.setAdapter(new TransactionAdapter(getContext(), list, "IDR"));
+                rv.setAdapter(new HistoryUnifiedAdapter(getContext(), finalList, currency));
             }
 
-            @Override public void onCancelled(@NonNull DatabaseError error) {}
+            @Override public void onCancelled(@NonNull DatabaseError e) {}
         });
     }
 }

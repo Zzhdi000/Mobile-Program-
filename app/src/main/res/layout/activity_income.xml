@@ -76,6 +76,6 @@
             android:text="ADD"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
-            android:background="#BDC3C7"/>
+            android:background="#D32F2F"/>
     </LinearLayout>
 </ScrollView>

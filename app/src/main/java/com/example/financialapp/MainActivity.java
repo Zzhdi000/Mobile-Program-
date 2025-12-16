@@ -1,16 +1,15 @@
 package com.example.financialapp;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,50 +25,85 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-
-        if (mAuth.getCurrentUser() == null) {
-            startActivity(new Intent(MainActivity.this, LoginScreen.class));
+        // USER BELUM LOGIN
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            startActivity(new Intent(this, LoginScreen.class));
             finish();
             return;
         }
 
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // Default fragment
+        // ===================================================
+        // ⬅⬅ Cek apakah user sudah onboarding
+        // ===================================================
+        FirebaseDatabase.getInstance().getReference("Users")
+                .child(uid)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+
+                    Boolean onboarded = snapshot.child("isOnboarded").getValue(Boolean.class);
+
+                    if (onboarded == null || !onboarded) {
+                        // User BELUM onboarding → buka OnboardingActivity
+                        startActivity(new Intent(MainActivity.this, OnboardingActivity.class));
+                        finish();
+                        return;
+                    }
+
+                    // ===================================================
+                    // ⬅⬅ Setelah onboarding → cek apakah sudah tutorial
+                    // ===================================================
+                    SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+                    boolean tutorialDone = prefs.getBoolean("tutorialCompleted", false);
+
+                    if (!tutorialDone) {
+                        // User BELUM tutorial → buka TutorialActivity
+                        startActivity(new Intent(MainActivity.this, TutorialActivity.class));
+                        finish();
+                        return;
+                    }
+
+                    // Kalau sudah onboarding + tutorial → lanjut normal
+                    if (!isFinishing() && !isDestroyed()) {
+                        setupBottomNav();
+                    }
+                });
+    }
+
+    private void setupBottomNav() {
+
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
         loadFragment(home_fragment);
 
-        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.home_Fragment:
+                    loadFragment(home_fragment);
+                    return true;
 
-                switch (item.getItemId()) {
-                    case R.id.home_Fragment:
-                        loadFragment(home_fragment);
-                        return true;
+                case R.id.dashboard_Fragment:
+                    loadFragment(dashboard_fragment);
+                    return true;
 
-                    case R.id.dashboard_Fragment:
-                        loadFragment(dashboard_fragment);
-                        return true;
+                case R.id.transaction_Fragment:
+                    loadFragment(transaction_fragment);
+                    return true;
 
-                    case R.id.transaction_Fragment:
-                        loadFragment(transaction_fragment);
-                        return true;
-
-                    case R.id.profile_Fragment:
-                        loadFragment(profile_fragment);
-                        return true;
-                }
-
-                return false;
+                case R.id.profile_Fragment:
+                    loadFragment(profile_fragment);
+                    return true;
             }
+            return false;
         });
     }
 
     public void loadFragment(Fragment fragment) {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.container, fragment)
-                .commit();
+        if (!isFinishing() && !isDestroyed()) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container, fragment)
+                    .commitAllowingStateLoss();
+        }
     }
 }

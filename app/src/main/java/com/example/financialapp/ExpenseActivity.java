@@ -2,6 +2,7 @@ package com.example.financialapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -24,6 +25,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 
 public class ExpenseActivity extends AppCompatActivity {
 
@@ -32,10 +34,13 @@ public class ExpenseActivity extends AppCompatActivity {
     private Button btnAdd;
 
     private FirebaseAuth mAuth;
-    private DatabaseReference cashRef;
+    private DatabaseReference cashRef, limitRef;
 
     private String currency = "LKR";
     private boolean isEditing = false;
+
+    private HashMap<String, Long> categoryLimitMap = new HashMap<>();
+    private HashMap<String, Long> categoryUsedMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +55,15 @@ public class ExpenseActivity extends AppCompatActivity {
         cashRef = FirebaseDatabase.getInstance().getReference("Cashdata")
                 .child(mAuth.getCurrentUser().getUid());
 
+        limitRef = FirebaseDatabase.getInstance().getReference("BudgetLimit")
+                .child(mAuth.getCurrentUser().getUid());
+
         loadCurrency();
         setupCategorySpinner();
         setupAmountFormatter();
+        loadCategoryLimitAndUsage();
 
-        btnAdd.setOnClickListener(v -> saveExpense());
+        btnAdd.setOnClickListener(v -> checkBeforeSaving());
     }
 
     private void loadCurrency() {
@@ -69,6 +78,65 @@ public class ExpenseActivity extends AppCompatActivity {
 
                     @Override public void onCancelled(@NonNull DatabaseError error) {}
                 });
+    }
+
+    private void loadCategoryLimitAndUsage() {
+
+        int currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1;
+
+        // RESET MAP
+        categoryLimitMap.clear();
+        categoryUsedMap.clear();
+
+        // Load LIMIT
+        limitRef.addValueEventListener(new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot snap) {
+
+                categoryLimitMap.clear();
+
+                for (DataSnapshot s : snap.getChildren()) {
+                    BudgetLimit bl = s.getValue(BudgetLimit.class);
+                    if (bl == null) continue;
+
+                    if (bl.getMonth() == currentMonth) {
+                        categoryLimitMap.put(bl.getCategory().toLowerCase(), (long) bl.getAmount());
+                    }
+                }
+
+                // Load USED
+                loadCategoryUsage(currentMonth);
+            }
+
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    private void loadCategoryUsage(int month) {
+
+        cashRef.addValueEventListener(new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot cashSnap) {
+
+                categoryUsedMap.clear();
+
+                for (DataSnapshot s : cashSnap.getChildren()) {
+
+                    Datacash d = s.getValue(Datacash.class);
+                    if (d == null) continue;
+
+                    if (d.getType().equals("expense") && d.getMonth() == month) {
+
+                        String cat = d.getCategory().toLowerCase();
+
+                        if (!categoryUsedMap.containsKey(cat))
+                            categoryUsedMap.put(cat, 0L);
+
+                        categoryUsedMap.put(cat, categoryUsedMap.get(cat) + d.getAmount());
+                    }
+                }
+            }
+
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
+        });
     }
 
     private void setupCategorySpinner() {
@@ -121,7 +189,8 @@ public class ExpenseActivity extends AppCompatActivity {
         });
     }
 
-    private void saveExpense() {
+    // 🔥 Check limit before saving expense
+    private void checkBeforeSaving() {
 
         String amountStr = etAmount.getText().toString().trim().replace(".", "");
         if (amountStr.isEmpty()) {
@@ -130,13 +199,38 @@ public class ExpenseActivity extends AppCompatActivity {
         }
 
         int amount = Integer.parseInt(amountStr);
-        String category = spinnerCategory.getSelectedItem().toString();
+        String category = spinnerCategory.getSelectedItem().toString().toLowerCase();
 
+        long limit = categoryLimitMap.containsKey(category) ? categoryLimitMap.get(category) : 0;
+        long used = categoryUsedMap.containsKey(category) ? categoryUsedMap.get(category) : 0;
+
+        // IF OVER LIMIT → popup warning
+        if (used + amount > limit && limit > 0) {
+
+            new AlertDialog.Builder(this)
+                    .setTitle("⚠ Limit Warning")
+                    .setMessage(
+                            "You have exceeded your " + category + " budget.\n\n" +
+                                    "Limit   : " + limit + "\n" +
+                                    "Current : " + used + "\n\n" +
+                                    "Do you still want to add this expense?"
+                    )
+                    .setPositiveButton("Add Anyway", (d, w) -> saveExpense(amount))
+                    .setNegativeButton("Cancel", null)
+                    .show();
+
+        } else {
+            saveExpense(amount);
+        }
+    }
+
+    private void saveExpense(int amount) {
+
+        String category = spinnerCategory.getSelectedItem().toString();
         String date = new SimpleDateFormat("dd-MM-yyyy")
                 .format(Calendar.getInstance().getTime());
 
         int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
-
         String id = cashRef.push().getKey();
 
         Datacash d = new Datacash(

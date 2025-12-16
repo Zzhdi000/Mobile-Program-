@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Chat Bubble -->
+    <path
+        android:fillColor="#E63124"
+        android:pathData="M20,2H4C2.9,2 2,2.9 2,4v18l4,-4h14c1.1,0 2,-0.9 2,-2V4C22,2.9 21.1,2 20,2z" />
+
+    <!-- Star / Highlight -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,9.5l1.09,2.45l2.41,0.21l-1.8,1.57l0.54,2.36L12,14.8l-2.24,1.29l0.54,-2.36l-1.8,-1.57l2.41,-0.21L12,9.5z" />
+</vector>

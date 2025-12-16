@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,12 +12,72 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FinancialApp">
 
+        <!-- ========================= -->
+        <!--        LOGIN / AUTH        -->
+        <!-- ========================= -->
+
+        <!-- Launcher -->
         <activity
-            android:name=".SetlimitActivity"
+            android:name=".LoginScreen"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+
+        </activity>
+
+        <!-- SIGN IN (INI PENYEBAB CRASH SEBELUMNYA) -->
+        <activity
+            android:name=".SignInActivity"
+            android:exported="true" />
+
+        <activity
+            android:name=".ForgotPasswordActivity"
             android:exported="false" />
 
         <activity
-            android:name=".SignInActivity"
+            android:name=".ChangePasswordActivity"
+            android:exported="false" />
+
+
+        <!-- ========================= -->
+        <!--        PROFILE AREA        -->
+        <!-- ========================= -->
+
+        <activity
+            android:name=".EditProfileActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false" />
+
+
+        <!-- ========================= -->
+        <!--     TUTORIAL / ONBOARD     -->
+        <!-- ========================= -->
+
+        <activity
+            android:name=".TutorialActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".OnboardingActivity"
+            android:exported="false" />
+
+
+        <!-- ========================= -->
+        <!--     FINANCIAL SECTION      -->
+        <!-- ========================= -->
+
+        <activity
+            android:name=".IncomeActivity"
             android:exported="false" />
 
         <activity
@@ -22,12 +85,11 @@
             android:exported="false" />
 
         <activity
-            android:name=".IncomeActivity"
-            android:exported="false"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
+            android:name=".ScanActivity"
+            android:exported="false" />
 
         <activity
-            android:name=".home_screen"
+            android:name=".SetlimitActivity"
             android:exported="false" />
 
         <activity
@@ -35,19 +97,18 @@
             android:exported="false" />
 
         <activity
+            android:name=".home_screen"
+            android:exported="false" />
+
+
+        <!-- ========================= -->
+        <!--        MAIN ACTIVITY       -->
+        <!-- ========================= -->
+
+        <activity
             android:name=".MainActivity"
             android:exported="true" />
 
-        <activity
-            android:name=".LoginScreen"
-            android:exported="true">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-        </activity>
 
     </application>
 

@@ -38,28 +38,21 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
         Datacash d = list.get(position);
 
-        // ========================
-        // SET AMOUNT + COLOR
-        // ========================
+        String symbol = NumberFormatHelper.getCurrencySymbol(currency);
+        String formattedAmount = NumberFormatHelper.formatCurrency(currency, d.getAmount());
         String prefix = d.getType().equals("income") ? "+ " : "- ";
-        holder.tvAmount.setText(prefix + currency + " " + d.getAmount());
+
+        holder.tvAmount.setText(prefix + symbol + " " + formattedAmount);
 
         if (d.getType().equals("income")) {
-            holder.tvAmount.setTextColor(Color.parseColor("#2ecc71")); // Hijau
-            holder.imgType.setImageResource(R.drawable.ic_income);     // ICON INCOME
+            holder.tvAmount.setTextColor(Color.parseColor("#2ecc71"));
+            holder.imgType.setImageResource(R.drawable.ic_income);
         } else {
-            holder.tvAmount.setTextColor(Color.parseColor("#e74c3c")); // Merah
-            holder.imgType.setImageResource(R.drawable.ic_expense);    // ICON EXPENSE
+            holder.tvAmount.setTextColor(Color.parseColor("#e74c3c"));
+            holder.imgType.setImageResource(R.drawable.ic_expense);
         }
 
-        // ========================
-        // CATEGORY
-        // ========================
         holder.tvCategory.setText(d.getCategory());
-
-        // ========================
-        // DATE
-        // ========================
         holder.tvDate.setText(d.getDate());
     }
 

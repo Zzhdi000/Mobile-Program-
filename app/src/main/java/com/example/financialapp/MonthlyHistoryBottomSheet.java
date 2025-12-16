@@ -20,10 +20,12 @@ import java.util.Calendar;
 public class MonthlyHistoryBottomSheet extends BottomSheetDialogFragment {
 
     private RecyclerView rv;
-    private ArrayList<Datacash> list = new ArrayList<>();
+    private ArrayList<Object> finalList = new ArrayList<>();
 
     private FirebaseAuth mAuth;
-    private DatabaseReference cashRef;
+    private DatabaseReference cashRef, userRef;
+
+    private String currency = "IDR";
 
     @Nullable
     @Override
@@ -37,13 +39,29 @@ public class MonthlyHistoryBottomSheet extends BottomSheetDialogFragment {
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
 
         mAuth = FirebaseAuth.getInstance();
+        String uid = mAuth.getCurrentUser().getUid();
+
         cashRef = FirebaseDatabase.getInstance()
                 .getReference("Cashdata")
-                .child(mAuth.getCurrentUser().getUid());
+                .child(uid);
 
-        loadMonthly();
+        userRef = FirebaseDatabase.getInstance()
+                .getReference("Users")
+                .child(uid);
+
+        loadCurrencyThenMonthly();
 
         return v;
+    }
+
+    private void loadCurrencyThenMonthly() {
+        userRef.child("currency").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot ds) {
+                if (ds.exists()) currency = ds.getValue(String.class);
+                loadMonthly();
+            }
+            @Override public void onCancelled(@NonNull DatabaseError e) {}
+        });
     }
 
     private void loadMonthly() {
@@ -54,18 +72,18 @@ public class MonthlyHistoryBottomSheet extends BottomSheetDialogFragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snap) {
 
-                list.clear();
+                finalList.clear();
+                finalList.add(new HistoryHeader("This Month"));
 
                 for (DataSnapshot s : snap.getChildren()) {
                     Datacash d = s.getValue(Datacash.class);
-                    if (d == null) continue;
 
-                    if (d.getMonth() == currentMonth) {
-                        list.add(d);
+                    if (d != null && d.getMonth() == currentMonth) {
+                        finalList.add(d);
                     }
                 }
 
-                rv.setAdapter(new TransactionAdapter(getContext(), list, "IDR"));
+                rv.setAdapter(new HistoryUnifiedAdapter(getContext(), finalList, currency));
             }
 
             @Override public void onCancelled(@NonNull DatabaseError error) {}

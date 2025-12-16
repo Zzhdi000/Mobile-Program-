@@ -50,8 +50,18 @@
             android:layout_marginStart="8dp"
             android:background="#6C5CE7"
             android:textColor="@android:color/white"/>
+
     </LinearLayout>
 
+    <Button
+        android:id="@+id/btnUseSavings"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:text="Use Savings"
+        android:textAllCaps="false"
+        android:backgroundTint="#2980B9"
+        android:textColor="@android:color/white"/>
     <Button
         android:id="@+id/btnWithdraw"
         android:layout_width="match_parent"

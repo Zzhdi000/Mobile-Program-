@@ -3,7 +3,6 @@ package com.example.financialapp;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -14,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import androidx.appcompat.app.AlertDialog;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -22,11 +20,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 public class Dashboard_Fragment extends Fragment {
 
@@ -59,7 +52,6 @@ public class Dashboard_Fragment extends Fragment {
     private TextView tvTransportLimit, tvTransportUsed;
     private ProgressBar pbTransport;
 
-    // Anti-spam popup
     private SharedPreferences prefs;
 
     @Override
@@ -78,7 +70,6 @@ public class Dashboard_Fragment extends Fragment {
                 .getReference("BudgetLimit")
                 .child(mAuth.getCurrentUser().getUid());
 
-        // SharedPreferences
         prefs = requireActivity().getSharedPreferences("LimitPopup", requireContext().MODE_PRIVATE);
 
         tvTotalIncome = v.findViewById(R.id.TV_totalIncome);
@@ -122,12 +113,6 @@ public class Dashboard_Fragment extends Fragment {
         return v;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        checkLimitWarning();
-    }
-
     private void loadCurrency() {
         CurrencyHelper.getCurrency(mAuth, c -> {
             currency = c;
@@ -141,21 +126,25 @@ public class Dashboard_Fragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                int totInc = 0;
-                int totExp = 0;
+                long totInc = 0;
+                long totExp = 0;
 
                 for (DataSnapshot s : snapshot.getChildren()) {
                     Datacash d = s.getValue(Datacash.class);
                     if (d == null) continue;
 
-                    if ("income".equals(d.getType()))
+                    if (d.getType().equals("income"))
                         totInc += d.getAmount();
-                    else if ("expense".equals(d.getType()))
+                    else if (d.getType().equals("expense"))
                         totExp += d.getAmount();
                 }
 
-                tvTotalIncome.setText(currency + " " + totInc);
-                tvTotalExpense.setText(currency + " " + totExp);
+                String symbol = NumberFormatHelper.getCurrencySymbol(currency);
+                String incF = NumberFormatHelper.formatCurrency(currency, totInc);
+                String expF = NumberFormatHelper.formatCurrency(currency, totExp);
+
+                tvTotalIncome.setText(symbol + " " + incF);
+                tvTotalExpense.setText(symbol + " " + expF);
             }
 
             @Override
@@ -174,39 +163,45 @@ public class Dashboard_Fragment extends Fragment {
     }
 
     private void loadLimit(String category, TextView tvLimit, TextView tvUsed, ProgressBar pb) {
+
         limitRef.addValueEventListener(new ValueEventListener() {
             @Override public void onDataChange(@NonNull DataSnapshot snap) {
 
-                int limit = 0;
+                long limit = 0;
 
                 for (DataSnapshot s : snap.getChildren()) {
                     BudgetLimit bl = s.getValue(BudgetLimit.class);
-                    if (bl != null && category.equalsIgnoreCase(bl.getCategory()))
+                    if (bl != null && bl.getCategory().equalsIgnoreCase(category))
                         limit = bl.getAmount();
                 }
 
-                tvLimit.setText("Limit: " + currency + " " + limit);
+                String symbol = NumberFormatHelper.getCurrencySymbol(currency);
+                String limitF = NumberFormatHelper.formatCurrency(currency, limit);
 
-                int finalLimit = limit;
+                tvLimit.setText("Limit: " + symbol + " " + limitF);
+
+                long finalLimit = limit;
 
                 cashRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override public void onDataChange(@NonNull DataSnapshot s2) {
 
-                        int used = 0;
+                        long used = 0;
 
                         for (DataSnapshot s : s2.getChildren()) {
                             Datacash d = s.getValue(Datacash.class);
 
                             if (d != null &&
-                                    "expense".equals(d.getType()) &&
-                                    category.equalsIgnoreCase(d.getCategory())) {
+                                    d.getType().equals("expense") &&
+                                    d.getCategory().equalsIgnoreCase(category)) {
 
                                 used += d.getAmount();
                             }
                         }
 
-                        tvUsed.setText("Used: " + currency + " " + used);
-                        updateProgressBar(finalLimit, used, pb);
+                        String usedF = NumberFormatHelper.formatCurrency(currency, used);
+                        tvUsed.setText("Used: " + symbol + " " + usedF);
+
+                        updateProgressBar((int) finalLimit, (int) used, pb);
                     }
 
                     @Override public void onCancelled(@NonNull DatabaseError error) {}
@@ -219,101 +214,15 @@ public class Dashboard_Fragment extends Fragment {
 
     private void updateProgressBar(int limit, int used, ProgressBar pb) {
 
-        if (pb == null) return;
-
-        int percent = 0;
-        if (limit > 0)
-            percent = (used * 100) / limit;
+        int percent = (limit > 0) ? (used * 100 / limit) : 0;
 
         pb.setProgress(percent);
 
-        try {
-            if (percent < 75)
-                pb.getProgressDrawable().setTint(Color.parseColor("#6C5CE7"));
-            else if (percent < 100)
-                pb.getProgressDrawable().setTint(Color.parseColor("#E67E22"));
-            else
-                pb.getProgressDrawable().setTint(Color.parseColor("#E74C3C"));
-
-        } catch (Exception ignored) {}
-    }
-
-    // ==========================================================================
-    //                         LIMIT WARNING POPUP (ANTI SPAM)
-    // ==========================================================================
-    private void checkLimitWarning() {
-
-        int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
-
-        limitRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override public void onDataChange(@NonNull DataSnapshot limitSnap) {
-
-                for (DataSnapshot L : limitSnap.getChildren()) {
-
-                    BudgetLimit bl = L.getValue(BudgetLimit.class);
-                    if (bl == null) continue;
-
-                    String category = bl.getCategory();
-                    int setLimit = bl.getAmount();
-
-                    cashRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override public void onDataChange(@NonNull DataSnapshot cashSnap) {
-
-                            int used = 0;
-
-                            for (DataSnapshot c : cashSnap.getChildren()) {
-                                Datacash d = c.getValue(Datacash.class);
-
-                                if (d != null &&
-                                        d.getMonth() == month &&
-                                        "expense".equals(d.getType()) &&
-                                        category.equalsIgnoreCase(d.getCategory())) {
-
-                                    used += d.getAmount();
-                                }
-                            }
-
-                            if (used >= setLimit && setLimit > 0) {
-                                if (shouldShowPopup(category)) {
-                                    showPopup(category, setLimit, used);
-                                    disablePopupForToday(category);
-                                }
-                            }
-                        }
-
-                        @Override public void onCancelled(@NonNull DatabaseError error) {}
-                    });
-                }
-            }
-
-            @Override public void onCancelled(@NonNull DatabaseError error) {}
-        });
-    }
-
-    private void showPopup(String category, int limit, int used) {
-        new AlertDialog.Builder(requireContext())
-                .setTitle("⚠ Limit Reached")
-                .setMessage(
-                        "Your " + category + " spending has reached the limit.\n\n" +
-                                "Limit : " + currency + " " + limit + "\n" +
-                                "Current: " + currency + " " + used
-                )
-                .setPositiveButton("OK", null)
-                .show();
-    }
-
-    private boolean shouldShowPopup(String category) {
-        String key = category + "_" + getToday();
-        return prefs.getBoolean(key, true);
-    }
-
-    private void disablePopupForToday(String category) {
-        String key = category + "_" + getToday();
-        prefs.edit().putBoolean(key, false).apply();
-    }
-
-    private String getToday() {
-        return new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-                .format(new Date());
+        if (percent < 75)
+            pb.getProgressDrawable().setTint(Color.parseColor("#6C5CE7"));
+        else if (percent < 100)
+            pb.getProgressDrawable().setTint(Color.parseColor("#E67E22"));
+        else
+            pb.getProgressDrawable().setTint(Color.parseColor("#E74C3C"));
     }
 }

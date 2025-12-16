@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="32dp"
+    android:background="#FFFFFF">
+
+    <ImageView
+        android:id="@+id/imgTutorial"
+        android:layout_width="220dp"
+        android:layout_height="220dp"
+        android:src="@drawable/ic_tutorial1"
+        android:contentDescription="tutorial"
+        android:layout_marginBottom="24dp" />
+
+    <TextView
+        android:id="@+id/tvTutorialTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Step 1"
+        android:textColor="#2C3E50"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="12dp"/>
+
+    <TextView
+        android:id="@+id/tvTutorialDesc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Get to know the main features of the app"
+        android:textColor="#34495E"
+        android:textSize="18sp"
+        android:gravity="center" />
+</LinearLayout>

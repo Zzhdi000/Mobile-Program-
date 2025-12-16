@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal">
+
+        <ImageView
+            android:id="@+id/imgOnboard"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:src="@drawable/ic_onboarding"
+            android:contentDescription="icon"
+            android:layout_marginBottom="24dp"
+            android:adjustViewBounds="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome!"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="#2C3E50"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="This app helps you manage:"
+            android:textColor="#34495E"
+            android:textSize="16sp"
+            android:layout_marginBottom="12dp"/>
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="1">
+
+            <TableRow>
+                <TextView
+                    android:text="✔"
+                    android:textSize="16sp"
+                    android:padding="4dp"/>
+
+                <TextView
+                    android:text="Income"
+                    android:textSize="16sp"
+                    android:textColor="#2C3E50"
+                    android:padding="4dp"/>
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:text="✔"
+                    android:textSize="16sp"
+                    android:padding="4dp"/>
+
+                <TextView
+                    android:text="Expenses"
+                    android:textSize="16sp"
+                    android:textColor="#2C3E50"
+                    android:padding="4dp"/>
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:text="✔"
+                    android:textSize="16sp"
+                    android:padding="4dp"/>
+
+                <TextView
+                    android:text="Spending Limits"
+                    android:textSize="16sp"
+                    android:textColor="#2C3E50"
+                    android:padding="4dp"/>
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:text="✔"
+                    android:textSize="16sp"
+                    android:padding="4dp"/>
+
+                <TextView
+                    android:text="Daily, Weekly, Monthly History"
+                    android:textSize="16sp"
+                    android:textColor="#2C3E50"
+                    android:padding="4dp"/>
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:text="✔"
+                    android:textSize="16sp"
+                    android:padding="4dp"/>
+
+                <TextView
+                    android:text="Savings Feature"
+                    android:textSize="16sp"
+                    android:textColor="#2C3E50"
+                    android:padding="4dp"/>
+            </TableRow>
+
+        </TableLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Use the bottom navigation to explore the app."
+            android:textColor="#34495E"
+            android:textSize="16sp"
+            android:layout_marginTop="20dp"/>
+
+        <Button
+            android:id="@+id/btnGetStarted"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="GET STARTED"
+            android:textColor="#FFFFFF"
+            android:background="#D32F2F"
+            android:textStyle="bold"
+            android:layout_marginTop="40dp"/>
+    </LinearLayout>
+
+</ScrollView>

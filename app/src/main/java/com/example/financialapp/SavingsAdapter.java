@@ -5,8 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.List;
 
 public class SavingsAdapter extends RecyclerView.Adapter<SavingsAdapter.VH> {
@@ -31,16 +33,26 @@ public class SavingsAdapter extends RecyclerView.Adapter<SavingsAdapter.VH> {
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
         Savings s = list.get(position);
-        holder.tvAmount.setText("+ " + currency + " " + s.getAmount());
+
+        long amount = s.getAmount();
+        String sign = amount >= 0 ? "+ " : "- ";
+
+        // selalu format nilai ABSOLUTE biar tidak ada "-2" setelah "+"
+        String formatted = NumberFormatHelper.formatCurrency(currency, Math.abs(amount));
+
+        holder.tvAmount.setText(sign + currency + " " + formatted);
         holder.tvDate.setText(s.getDate());
         holder.tvNote.setText(s.getNote() == null ? "" : s.getNote());
     }
 
     @Override
-    public int getItemCount() { return list.size(); }
+    public int getItemCount() {
+        return list.size();
+    }
 
     static class VH extends RecyclerView.ViewHolder {
         TextView tvAmount, tvDate, tvNote;
+
         VH(@NonNull View itemView) {
             super(itemView);
             tvAmount = itemView.findViewById(R.id.tvSaveAmount);

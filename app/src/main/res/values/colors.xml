@@ -15,4 +15,25 @@
     <color name="card_viewGreen">#E0F2F1</color>
     <color name="gray_text">#9E9E9E</color>
     <color name="outcome_blue">#0045A8</color>
+    <color name="background">#F4F5F7</color>
+    <color name="textPrimary">#212121</color>
+    <color name="purpleCard">#7E57C2</color>
+
+    <!-- Primary Palette -->
+    <color name="primaryRed">#D32F2F</color>
+    <color name="primaryRedDark">#B71C1C</color>
+    <color name="accentRed">#EF5350</color>
+
+    <!-- Secondary -->
+    <color name="backgroundSoft">#F7F8FC</color>
+    <color name="cardBackground">#FFFFFF</color>
+    <color name="dividerGray">#E3E6EC</color>
+
+    <!-- Text -->
+    <color name="textSecondary">#616161</color>
+
+    <!-- Danger -->
+    <color name="dangerRedDark">#B71C1C</color>
+    <color name="dangerRed">#D32F2F</color>
+
 </resources>

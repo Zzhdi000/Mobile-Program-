@@ -20,9 +20,12 @@ import java.util.*;
 public class DailyHistoryBottomSheet extends BottomSheetDialogFragment {
 
     private RecyclerView rv;
-    private ArrayList<Datacash> list = new ArrayList<>();
+    private ArrayList<Object> finalList = new ArrayList<>();
+
     private FirebaseAuth mAuth;
-    private DatabaseReference cashRef;
+    private DatabaseReference cashRef, userRef;
+
+    private String currency = "IDR";
 
     @Nullable
     @Override
@@ -36,32 +39,51 @@ public class DailyHistoryBottomSheet extends BottomSheetDialogFragment {
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
 
         mAuth = FirebaseAuth.getInstance();
+        String uid = mAuth.getCurrentUser().getUid();
 
         cashRef = FirebaseDatabase.getInstance()
                 .getReference("Cashdata")
-                .child(mAuth.getCurrentUser().getUid());
+                .child(uid);
 
-        loadDaily();
+        userRef = FirebaseDatabase.getInstance()
+                .getReference("Users")
+                .child(uid);
+
+        loadCurrencyThenDaily();
 
         return v;
     }
 
+    private void loadCurrencyThenDaily() {
+        userRef.child("currency").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot ds) {
+                if (ds.exists()) currency = ds.getValue(String.class);
+                loadDaily();
+            }
+            @Override public void onCancelled(@NonNull DatabaseError e) {}
+        });
+    }
+
     private void loadDaily() {
-        String today = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+
+        String today = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+                .format(new Date());
 
         cashRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snap) {
-                list.clear();
+
+                finalList.clear();
+                finalList.add(new HistoryHeader("Today"));
 
                 for (DataSnapshot s : snap.getChildren()) {
                     Datacash d = s.getValue(Datacash.class);
                     if (d != null && d.getDate().equals(today)) {
-                        list.add(d);
+                        finalList.add(d);
                     }
                 }
 
-                rv.setAdapter(new TransactionAdapter(getContext(), list, "IDR"));
+                rv.setAdapter(new HistoryUnifiedAdapter(getContext(), finalList, currency));
             }
 
             @Override public void onCancelled(@NonNull DatabaseError e) {}

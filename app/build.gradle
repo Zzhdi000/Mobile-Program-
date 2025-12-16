@@ -15,7 +15,9 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildFeatures { viewBinding true }
+        buildFeatures {
+            viewBinding true
+        }
     }
 
     buildTypes {
@@ -24,37 +26,55 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     namespace 'com.example.financialapp'
 }
 
 dependencies {
-
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.navigation:navigation-fragment:2.4.2'
     implementation 'androidx.navigation:navigation-ui:2.4.2'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
     implementation 'com.google.android.material:material:1.6.1'
+
     implementation platform('com.google.firebase:firebase-bom:34.2.0')
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'joda-time:joda-time:2.10.14'
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-database'
-    implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.firebaseui:firebase-ui-database:8.0.2'
+
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.12.0'
-    implementation "androidx.datastore:datastore-preferences:1.0.0"
+    implementation 'androidx.datastore:datastore-preferences:1.0.0'
     implementation 'androidx.datastore:datastore:1.0.0'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
+    // ================================
+    // 🔥 TAMBAHAN LIBRARY ONBOARDING
+    // ================================
 
+    // (1) ViewPager2 untuk slide onboarding
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+
+    // (2) Dots Indicator (indicator bulat di bawah)
+    implementation 'com.tbuonomo:dotsindicator:4.3'
+
+    // (3) Lottie Animation (biar onboarding ada animasi)
+    implementation 'com.airbnb.android:lottie:6.3.0'
+
+    implementation 'com.google.mlkit:text-recognition:16.0.0'
 
 }
